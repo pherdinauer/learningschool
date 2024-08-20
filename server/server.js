@@ -43,8 +43,8 @@ const upload = multer({ storage: storage });
 // Serve i file statici
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Funzione per generare la thumbnail
-const generateThumbnail = (videoPath, thumbnailPath) => {
+// Funzione per generare la thumbnail e ottenere la durata del video
+const processVideo = (videoPath, thumbnailPath) => {
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .screenshots({
@@ -53,10 +53,16 @@ const generateThumbnail = (videoPath, thumbnailPath) => {
         filename: path.basename(thumbnailPath),
         size: '320x240'
       })
-      .on('end', () => resolve(thumbnailPath))
-      .on('error', (err) => {
-        console.error('Error generating thumbnail:', err);
-        resolve(null); // Risolvi con null invece di rifiutare la promessa
+      .ffprobe((err, metadata) => {
+        if (err) {
+          console.error('Error processing video:', err);
+          reject(err);
+        } else {
+          resolve({
+            thumbnailPath: thumbnailPath,
+            duration: metadata.format.duration
+          });
+        }
       });
   });
 };
@@ -74,23 +80,22 @@ async function loadExistingVideos() {
         const videoUrl = `/uploads/videos/${file}`;
         const thumbnailFile = file.replace(path.extname(file), '_thumbnail.png');
         const thumbnailUrl = `/uploads/thumbnails/${thumbnailFile}`;
+        const videoPath = path.join(videoDir, file);
+        const thumbnailPath = path.join(thumbnailDir, thumbnailFile);
         
-        // Verifica se esiste la thumbnail
         try {
-          await fs.access(path.join(thumbnailDir, thumbnailFile));
-        } catch {
-          // Se la thumbnail non esiste, generala
-          await generateThumbnail(path.join(videoDir, file), path.join(thumbnailDir, thumbnailFile));
+          const { duration } = await processVideo(videoPath, thumbnailPath);
+          videos.push({
+            id: Date.now() + Math.random(),
+            title: path.basename(file, path.extname(file)),
+            duration: duration,
+            transcript: '',
+            videoUrl,
+            thumbnailUrl
+          });
+        } catch (error) {
+          console.error(`Error processing video ${file}:`, error);
         }
-
-        videos.push({
-          id: Date.now() + Math.random(), // Genera un ID unico
-          title: path.basename(file, path.extname(file)),
-          duration: 'Unknown', // Potresti voler estrarre questa informazione dal file video
-          transcript: '', // Potresti voler caricare questa informazione da un file separato
-          videoUrl,
-          thumbnailUrl
-        });
       }
     }
     console.log(`Loaded ${videos.length} existing videos.`);
@@ -99,10 +104,16 @@ async function loadExistingVideos() {
   }
 }
 
+// Endpoint per ottenere tutti i video
+app.get('/videos', (req, res) => {
+  console.log('GET /videos - Sending videos:', videos);
+  res.json(videos);
+});
+
 // Endpoint per il caricamento dei video
 app.post('/upload', upload.single('video'), async (req, res) => {
   try {
-    const { title, duration, transcript } = req.body;
+    const { title, transcript } = req.body;
     const videoFile = req.file;
 
     if (!videoFile) {
@@ -113,8 +124,8 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     const thumbnailFilename = `${Date.now()}_thumbnail.png`;
     const thumbnailPath = path.join(__dirname, 'uploads', 'thumbnails', thumbnailFilename);
 
-    // Genera la thumbnail
-    await generateThumbnail(videoPath, thumbnailPath);
+    // Genera la thumbnail e ottiene la durata
+    const { duration } = await processVideo(videoPath, thumbnailPath);
 
     const video = {
       id: Date.now(),
@@ -126,16 +137,12 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     };
 
     videos.push(video);
+    console.log('New video added:', video);
     res.status(200).json(video);
   } catch (error) {
     console.error('Error during file upload:', error);
     res.status(500).json({ error: 'An error occurred during file upload' });
   }
-});
-
-// Endpoint per ottenere tutti i video
-app.get('/videos', (req, res) => {
-  res.json(videos);
 });
 
 // Endpoint per ottenere un video specifico
