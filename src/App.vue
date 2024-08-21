@@ -7,31 +7,59 @@
           <img src="../src/assets/logo.png" alt="Logo" class="w-32 mx-auto">
         </div>
         <nav class="flex-grow">
-          <router-link to="/" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Home</router-link>
-          <router-link to="/favorites" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Favorites</router-link>
-          <button v-if="isAdminUser" @click="showUploadModal = true" class="block w-full text-left py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Upload Video</button>
+          <router-link to="/" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            Home
+          </router-link>
+          <router-link to="/favorites" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            Favorites
+          </router-link>
         </nav>
-        <button @click="logout" class="block w-full text-left py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 mt-auto">Logout</button>
+        <button @click="logout" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 mt-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+          </svg>
+          Logout
+        </button>
       </div>
 
       <!-- Main content -->
       <div class="flex-1 overflow-y-auto">
-        <header class="bg-white dark:bg-gray-900 shadow-sm flex justify-between items-center">
-          <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex-grow">
-            <input v-if="isLoggedIn && !isLoginPage" type="text" v-model="searchQuery" placeholder="Search videos..." class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600">
+        <header v-if="isLoggedIn && !isLoginPage" class="bg-white dark:bg-gray-900 shadow-sm">
+          <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Home</h1>
+              <p class="text-gray-600 dark:text-gray-300">Welcome, {{ username }}</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <input type="text" v-model="searchQuery" placeholder="Search videos..." class="px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 w-64">
+              <!-- Dark mode toggle button -->
+              <button @click="toggleDarkMode" class="p-2 rounded-full bg-gray-200 dark:bg-gray-600">
+                <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <!-- Dark mode toggle button -->
-          <button @click="toggleDarkMode" class="p-2 mr-4 rounded-full bg-gray-200 dark:bg-gray-600">
-            <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
         </header>
 
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div v-if="isAdminUser" class="mb-4 flex justify-end">
+            <button @click="showUploadModal = true" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+              Upload Video
+            </button>
+          </div>
           <router-view :searchQuery="searchQuery"></router-view>
         </main>
       </div>
@@ -59,6 +87,7 @@ export default defineComponent({
     const showUploadModal = ref(false);
     const isDarkMode = ref(localStorage.getItem('darkMode') === 'true');
     const userRole = ref(localStorage.getItem('userRole'));
+    const username = ref(localStorage.getItem('username') || 'User');
 
     const isLoggedIn = computed(() => {
       return !!userRole.value;
@@ -74,7 +103,8 @@ export default defineComponent({
 
     const logout = () => {
       localStorage.removeItem('userRole');
-      window.dispatchEvent(new CustomEvent('userRole-changed', { detail: { userRole: null } }));
+      localStorage.removeItem('username');
+      window.dispatchEvent(new CustomEvent('userRole-changed', { detail: { userRole: null, username: null } }));
       router.push('/login');
     };
 
@@ -93,6 +123,7 @@ export default defineComponent({
 
     const handleUserRoleChange = (event: CustomEvent) => {
       userRole.value = event.detail.userRole;
+      username.value = event.detail.username || 'User';
     };
 
     const handleDarkModeChange = (event: CustomEvent) => {
@@ -126,7 +157,8 @@ export default defineComponent({
       logout,
       onVideoUploaded,
       isDarkMode,
-      toggleDarkMode
+      toggleDarkMode,
+      username
     };
   }
 });
