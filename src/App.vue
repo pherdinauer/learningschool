@@ -4,7 +4,7 @@
       <!-- Sidebar (visibile solo se l'utente è loggato e non è nella pagina di login) -->
       <div v-if="isLoggedIn && !isLoginPage" class="w-64 bg-white dark:bg-gray-900 shadow-md flex flex-col">
         <div class="p-4">
-          <img src="..//src/assets/logo.png" alt="Logo" class="w-32 mx-auto">
+          <img src="../src/assets/logo.png" alt="Logo" class="w-32 mx-auto">
         </div>
         <nav class="flex-grow">
           <router-link to="/" class="block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">Home</router-link>
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import UploadModal from '@/components/UploadModal.vue';
 
@@ -58,13 +58,14 @@ export default defineComponent({
     const searchQuery = ref('');
     const showUploadModal = ref(false);
     const isDarkMode = ref(localStorage.getItem('darkMode') === 'true');
+    const userRole = ref(localStorage.getItem('userRole'));
 
     const isLoggedIn = computed(() => {
-      return !!localStorage.getItem('userRole');
+      return !!userRole.value;
     });
 
     const isAdminUser = computed(() => {
-      return localStorage.getItem('userRole') === 'admin';
+      return userRole.value === 'admin';
     });
 
     const isLoginPage = computed(() => {
@@ -73,6 +74,7 @@ export default defineComponent({
 
     const logout = () => {
       localStorage.removeItem('userRole');
+      window.dispatchEvent(new CustomEvent('userRole-changed', { detail: { userRole: null } }));
       router.push('/login');
     };
 
@@ -86,15 +88,34 @@ export default defineComponent({
     const toggleDarkMode = () => {
       isDarkMode.value = !isDarkMode.value;
       localStorage.setItem('darkMode', isDarkMode.value.toString());
+      window.dispatchEvent(new CustomEvent('darkMode-changed', { detail: { isDarkMode: isDarkMode.value } }));
     };
 
-    watch(isDarkMode, (newValue) => {
-      if (newValue) {
+    const handleUserRoleChange = (event: CustomEvent) => {
+      userRole.value = event.detail.userRole;
+    };
+
+    const handleDarkModeChange = (event: CustomEvent) => {
+      isDarkMode.value = event.detail.isDarkMode;
+      if (isDarkMode.value) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
-    }, { immediate: true });
+    };
+
+    onMounted(() => {
+      window.addEventListener('userRole-changed', handleUserRoleChange as EventListener);
+      window.addEventListener('darkMode-changed', handleDarkModeChange as EventListener);
+      if (isDarkMode.value) {
+        document.documentElement.classList.add('dark');
+      }
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('userRole-changed', handleUserRoleChange as EventListener);
+      window.removeEventListener('darkMode-changed', handleDarkModeChange as EventListener);
+    });
 
     return { 
       searchQuery, 

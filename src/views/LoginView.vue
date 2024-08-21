@@ -41,16 +41,19 @@ export default defineComponent({
     const password = ref('');
 
     const login = () => {
-      // Implementa qui la tua logica di autenticazione
-      if (username.value === 'admin' && password.value === 'admin') {
-        localStorage.setItem('userRole', 'admin');
-        router.push('/');
-      } else if (username.value === 'user' && password.value === 'user') {
-        localStorage.setItem('userRole', 'user');
-        router.push('/');
+      let userRole = '';
+      if (username.value === 'admin' && password.value === 'adminpassword') {
+        userRole = 'admin';
+      } else if (username.value === 'user' && password.value === 'userpassword') {
+        userRole = 'user';
       } else {
         alert('Invalid credentials');
+        return;
       }
+
+      localStorage.setItem('userRole', userRole);
+      window.dispatchEvent(new CustomEvent('userRole-changed', { detail: { userRole } }));
+      router.push('/');
     };
 
     return {
