@@ -15,6 +15,14 @@ app.use(express.json());
 // Array per memorizzare i dati dei video
 let videos = [];
 
+// Set per memorizzare tutti i tag unici
+let allTags = new Set();
+
+// Funzione per aggiornare allTags
+const updateAllTags = (videoTags) => {
+  videoTags.forEach(tag => allTags.add(tag));
+};
+
 // Funzione per generare ID unici
 const generateId = () => Date.now().toString() + Math.random().toString().slice(2);
 
@@ -94,7 +102,8 @@ async function loadExistingVideos() {
             duration: duration,
             transcript: '',
             videoUrl,
-            thumbnailUrl
+            thumbnailUrl,
+            tags: [] // Aggiunto un array vuoto per i tag
           });
         } catch (error) {
           console.error(`Error processing video ${file}:`, error);
@@ -113,10 +122,17 @@ app.get('/videos', (req, res) => {
   res.json(videos);
 });
 
+
 // Endpoint per il caricamento dei video
 app.post('/upload', upload.single('video'), async (req, res) => {
   try {
     const { title, transcript } = req.body;
+    let tags = [];
+    try {
+      tags = JSON.parse(req.body.tags || '[]');
+    } catch (error) {
+      console.error('Error parsing tags:', error);
+    }
     const videoFile = req.file;
 
     if (!videoFile) {
@@ -132,20 +148,27 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 
     const video = {
       id: generateId(),
-      title,
+      title: title || 'Untitled Video', // Usa il titolo fornito o un titolo predefinito
       duration,
       transcript,
       videoUrl: `/uploads/videos/${videoFile.filename}`,
-      thumbnailUrl: `/uploads/thumbnails/${thumbnailFilename}`
+      thumbnailUrl: `/uploads/thumbnails/${thumbnailFilename}`,
+      tags
     };
 
     videos.push(video);
+    updateAllTags(tags);
     console.log('New video added:', video);
     res.status(200).json(video);
   } catch (error) {
     console.error('Error during file upload:', error);
     res.status(500).json({ error: 'An error occurred during file upload' });
   }
+});
+
+// Endpoint per ottenere tutti i tag
+app.get('/tags', (req, res) => {
+  res.json(Array.from(allTags));
 });
 
 // Endpoint per ottenere un video specifico
@@ -160,7 +183,7 @@ app.get('/videos/:id', (req, res) => {
 
 // Endpoint per aggiornare un video
 app.put('/videos/:id', async (req, res) => {
-  const { title, transcript } = req.body;
+  const { title, transcript, tags } = req.body;
   const videoId = req.params.id;
   const videoIndex = videos.findIndex(v => v.id === videoId);
 
@@ -171,9 +194,11 @@ app.put('/videos/:id', async (req, res) => {
   videos[videoIndex] = {
     ...videos[videoIndex],
     title,
-    transcript
+    transcript,
+    tags
   };
 
+  updateAllTags(tags);
   res.json(videos[videoIndex]);
 });
 
