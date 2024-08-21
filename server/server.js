@@ -20,7 +20,9 @@ let allTags = new Set();
 
 // Funzione per aggiornare allTags
 const updateAllTags = (videoTags) => {
-  videoTags.forEach(tag => allTags.add(tag));
+  if (Array.isArray(videoTags)) {
+    videoTags.forEach(tag => allTags.add(tag));
+  }
 };
 
 // Funzione per generare ID unici
@@ -28,7 +30,7 @@ const generateId = () => Date.now().toString() + Math.random().toString().slice(
 
 // Funzione per creare le cartelle di upload se non esistono
 const createUploadDirectories = async () => {
-  const dirs = ['uploads/videos', 'uploads/thumbnails'];
+  const dirs = ['uploads/videos', 'uploads/thumbnails', 'data'];
   for (const dir of dirs) {
     try {
       await fs.mkdir(dir, { recursive: true });
@@ -78,50 +80,45 @@ const processVideo = (videoPath, thumbnailPath) => {
   });
 };
 
-// Funzione per caricare i video esistenti
-async function loadExistingVideos() {
-  const videoDir = path.join(__dirname, 'uploads', 'videos');
-  const thumbnailDir = path.join(__dirname, 'uploads', 'thumbnails');
-  
+// Funzione per salvare i dati in un file JSON
+const saveData = async () => {
   try {
-    const files = await fs.readdir(videoDir);
-    for (const file of files) {
-      const stats = await fs.stat(path.join(videoDir, file));
-      if (stats.isFile()) {
-        const videoUrl = `/uploads/videos/${file}`;
-        const thumbnailFile = file.replace(path.extname(file), '_thumbnail.png');
-        const thumbnailUrl = `/uploads/thumbnails/${thumbnailFile}`;
-        const videoPath = path.join(videoDir, file);
-        const thumbnailPath = path.join(thumbnailDir, thumbnailFile);
-        
-        try {
-          const { duration } = await processVideo(videoPath, thumbnailPath);
-          videos.push({
-            id: generateId(),
-            title: path.basename(file, path.extname(file)),
-            duration: duration,
-            transcript: '',
-            videoUrl,
-            thumbnailUrl,
-            tags: [] // Aggiunto un array vuoto per i tag
-          });
-        } catch (error) {
-          console.error(`Error processing video ${file}:`, error);
-        }
-      }
-    }
-    console.log(`Loaded ${videos.length} existing videos.`);
+    await fs.writeFile('data/videos.json', JSON.stringify(videos));
+    await fs.writeFile('data/tags.json', JSON.stringify(Array.from(allTags)));
+    console.log('Data saved successfully');
   } catch (error) {
-    console.error('Error loading existing videos:', error);
+    console.error('Error saving data:', error);
   }
-}
+};
+
+// Funzione per caricare i dati da file JSON
+const loadData = async () => {
+  try {
+    const videosData = await fs.readFile('data/videos.json', 'utf8');
+    const tagsData = await fs.readFile('data/tags.json', 'utf8');
+    videos = JSON.parse(videosData);
+    allTags = new Set(JSON.parse(tagsData));
+    console.log('Data loaded successfully');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('No existing data found. Starting with empty data.');
+      videos = [];
+      allTags = new Set();
+      // Salva i file vuoti per evitare questo errore in futuro
+      await saveData();
+    } else {
+      console.error('Error loading data:', error);
+      // Se c'è un altro tipo di errore, inizializza comunque con array/set vuoti
+      videos = [];
+      allTags = new Set();
+    }
+  }
+};
 
 // Endpoint per ottenere tutti i video
 app.get('/videos', (req, res) => {
-  console.log('GET /videos - Sending videos:', videos);
   res.json(videos);
 });
-
 
 // Endpoint per il caricamento dei video
 app.post('/upload', upload.single('video'), async (req, res) => {
@@ -148,7 +145,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 
     const video = {
       id: generateId(),
-      title: title || 'Untitled Video', // Usa il titolo fornito o un titolo predefinito
+      title: title || 'Untitled Video',
       duration,
       transcript,
       videoUrl: `/uploads/videos/${videoFile.filename}`,
@@ -158,6 +155,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 
     videos.push(video);
     updateAllTags(tags);
+    await saveData();
     console.log('New video added:', video);
     res.status(200).json(video);
   } catch (error) {
@@ -193,12 +191,13 @@ app.put('/videos/:id', async (req, res) => {
 
   videos[videoIndex] = {
     ...videos[videoIndex],
-    title,
-    transcript,
-    tags
+    title: title || videos[videoIndex].title,
+    transcript: transcript || videos[videoIndex].transcript,
+    tags: tags || videos[videoIndex].tags
   };
 
-  updateAllTags(tags);
+  updateAllTags(videos[videoIndex].tags);
+  await saveData();
   res.json(videos[videoIndex]);
 });
 
@@ -221,6 +220,7 @@ app.delete('/videos/:id', async (req, res) => {
     // Rimuovi il video dall'array
     videos.splice(videoIndex, 1);
     
+    await saveData();
     res.json({ message: 'Video deleted successfully' });
   } catch (error) {
     console.error('Error deleting video files:', error);
@@ -239,5 +239,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await createUploadDirectories();
-  await loadExistingVideos();
+  await loadData();
 });
