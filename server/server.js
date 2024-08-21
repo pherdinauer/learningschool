@@ -15,6 +15,9 @@ app.use(express.json());
 // Array per memorizzare i dati dei video
 let videos = [];
 
+// Funzione per generare ID unici
+const generateId = () => Date.now().toString() + Math.random().toString().slice(2);
+
 // Funzione per creare le cartelle di upload se non esistono
 const createUploadDirectories = async () => {
   const dirs = ['uploads/videos', 'uploads/thumbnails'];
@@ -86,7 +89,7 @@ async function loadExistingVideos() {
         try {
           const { duration } = await processVideo(videoPath, thumbnailPath);
           videos.push({
-            id: Date.now() + Math.random(),
+            id: generateId(),
             title: path.basename(file, path.extname(file)),
             duration: duration,
             transcript: '',
@@ -128,7 +131,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     const { duration } = await processVideo(videoPath, thumbnailPath);
 
     const video = {
-      id: Date.now(),
+      id: generateId(),
       title,
       duration,
       transcript,
@@ -147,7 +150,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 
 // Endpoint per ottenere un video specifico
 app.get('/videos/:id', (req, res) => {
-  const video = videos.find(v => v.id === parseInt(req.params.id));
+  const video = videos.find(v => v.id === req.params.id);
   if (video) {
     res.json(video);
   } else {
@@ -155,19 +158,48 @@ app.get('/videos/:id', (req, res) => {
   }
 });
 
+// Endpoint per aggiornare un video
+app.put('/videos/:id', async (req, res) => {
+  const { title, transcript } = req.body;
+  const videoId = req.params.id;
+  const videoIndex = videos.findIndex(v => v.id === videoId);
+
+  if (videoIndex === -1) {
+    return res.status(404).json({ error: 'Video not found' });
+  }
+
+  videos[videoIndex] = {
+    ...videos[videoIndex],
+    title,
+    transcript
+  };
+
+  res.json(videos[videoIndex]);
+});
+
 // Endpoint per eliminare un video
-app.delete('/videos/:id', (req, res) => {
-  const index = videos.findIndex(v => v.id === parseInt(req.params.id));
-  if (index !== -1) {
-    const video = videos[index];
+app.delete('/videos/:id', async (req, res) => {
+  const videoId = req.params.id;
+  const videoIndex = videos.findIndex(v => v.id === videoId);
+
+  if (videoIndex === -1) {
+    return res.status(404).json({ error: 'Video not found' });
+  }
+
+  const video = videos[videoIndex];
+
+  try {
     // Elimina i file associati
-    fs.unlink(path.join(__dirname, video.videoUrl)).catch(console.error);
-    fs.unlink(path.join(__dirname, video.thumbnailUrl)).catch(console.error);
+    await fs.unlink(path.join(__dirname, video.videoUrl));
+    await fs.unlink(path.join(__dirname, video.thumbnailUrl));
+    
     // Rimuovi il video dall'array
-    videos.splice(index, 1);
+    videos.splice(videoIndex, 1);
+    
     res.json({ message: 'Video deleted successfully' });
-  } else {
-    res.status(404).json({ error: 'Video not found' });
+  } catch (error) {
+    console.error('Error deleting video files:', error);
+    res.status(500).json({ error: 'An error occurred while deleting the video' });
   }
 });
 

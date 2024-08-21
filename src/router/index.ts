@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import FavoritesView from '../views/FavoritesView.vue'
+import VideoManagementView from '../views/VideoManagementView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Favorites',
     component: FavoritesView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/video-management',
+    name: 'VideoManagement',
+    component: VideoManagementView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -28,9 +35,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const userRole = localStorage.getItem('userRole')
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!localStorage.getItem('userRole')) {
+    if (!userRole) {
       next('/login')
+    } else if (to.matched.some(record => record.meta.requiresAdmin) && userRole !== 'admin') {
+      next('/')
     } else {
       next()
     }

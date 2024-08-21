@@ -3,25 +3,31 @@
     <div class="flex h-screen">
       <!-- Sidebar (visibile solo se l'utente è loggato e non è nella pagina di login) -->
       <div v-if="isLoggedIn && !isLoginPage" class="w-64 bg-white dark:bg-gray-900 shadow-md flex flex-col">
-        <div class="p-4">
-          <img src="../src/assets/logo.png" alt="Logo" class="w-32 mx-auto">
+        <div class="p-4 mb-6">
+          <img src="@/assets/logo.png" alt="Logo" class="w-32 mx-auto">
         </div>
-        <nav class="flex-grow">
-          <router-link to="/" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <nav class="flex-grow space-y-4">
+          <router-link to="/" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
             Home
           </router-link>
-          <router-link to="/favorites" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <router-link to="/favorites" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
             Favorites
           </router-link>
+          <router-link to="/video-management" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+            </svg>
+            Manage Videos
+          </router-link>
         </nav>
-        <button @click="logout" class="flex items-center py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 mt-auto">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <button @click="logout" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 mt-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
           </svg>
           Logout
@@ -34,7 +40,9 @@
           <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
               <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Home</h1>
-              <p class="text-gray-600 dark:text-gray-300">Welcome, {{ username }}</p>
+              <p class="text-gray-600 dark:text-gray-300">
+                Welcome, {{ isAdminUser ? 'Admin' : 'User' }} {{ username }}
+              </p>
             </div>
             <div class="flex items-center space-x-4">
               <input type="text" v-model="searchQuery" placeholder="Search videos..." class="px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 w-64">
