@@ -7,7 +7,7 @@
           <img src="@/assets/logo.png" alt="Logo" class="w-32 mx-auto">
         </div>
         
-        <nav class="space-y-4">
+        <nav class="space-y-2">
           <router-link to="/" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -20,43 +20,37 @@
             </svg>
             Favorites
           </router-link>
-          <!-- Mostra il link "Manage Videos" solo per gli utenti admin -->
           <router-link v-if="isAdminUser" to="/video-management" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
             </svg>
             Manage Videos
           </router-link>
-        </nav>
-
-        <!-- Sezione Tag -->
-        <div class="px-4 mt-6 mb-4">
-          <h2 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-            </svg>
-            Tag
-          </h2>
-          <div class="border-t border-b border-gray-200 dark:border-gray-700 py-2">
-            <div class="max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-              <ul>
-                <li v-for="tag in uniqueTags" :key="tag" class="mb-1">
-                  <button 
-                    @click="toggleTagFilter(tag)"
-                    class="w-full text-left flex justify-between items-center py-1 px-2 rounded transition-colors duration-200"
-                    :class="{
-                      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': selectedTag === tag,
-                      'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-800': selectedTag !== tag
-                    }"
-                  >
-                    <span>{{ tag }}</span>
-                    <span v-if="selectedTag === tag" class="text-xs ml-2">&times;</span>
-                  </button>
-                </li>
-              </ul>
+          
+          <!-- Sezione Tag -->
+          <div class="py-3 px-6">
+            <h2 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+              </svg>
+              Tag
+            </h2>
+            <div class="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+              <button 
+                v-for="tag in uniqueTags" 
+                :key="tag" 
+                @click="toggleTagFilter(tag)"
+                class="w-full text-left flex justify-between items-center py-2 px-3 rounded transition-colors duration-200 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                :class="{
+                  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': selectedTag === tag
+                }"
+              >
+                <span>{{ tag }}</span>
+                <span v-if="selectedTag === tag" class="text-xs ml-2">&times;</span>
+              </button>
             </div>
           </div>
-        </div>
+        </nav>
 
         <div class="mt-auto">
           <button @click="logout" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 w-full">
