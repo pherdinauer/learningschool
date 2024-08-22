@@ -20,7 +20,7 @@
     <div class="w-3/4">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
-          <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover" @error="handleImageError">
+          <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover">
           <div class="p-4">
             <div class="flex justify-between items-start">
               <h3 class="font-bold text-xl mb-2 dark:text-white">{{ video.title }}</h3>
@@ -118,7 +118,6 @@ export default defineComponent({
     });
 
     const getFullUrl = (path: string) => {
-      if (!path) return ''; // Gestisce il caso in cui path sia undefined o null
       return `http://localhost:3000${path}`;
     };
 
@@ -154,11 +153,6 @@ export default defineComponent({
       selectedTag.value = selectedTag.value === tag ? null : tag;
     };
 
-    const handleImageError = (event: Event) => {
-      const target = event.target as HTMLImageElement;
-      target.src = '/path/to/fallback/image.jpg'; // Sostituisci con un'immagine di fallback
-    };
-
     watch(() => props.searchQuery, fetchVideos);
 
     return { 
@@ -172,8 +166,7 @@ export default defineComponent({
       isFavorite,
       allTags,
       selectedTag,
-      filterByTag,
-      handleImageError
+      filterByTag
     };
   }
 });
