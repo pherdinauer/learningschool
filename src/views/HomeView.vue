@@ -1,23 +1,7 @@
 <template>
   <div class="flex">
-    <!-- Colonna dei tag -->
-    <div class="w-1/4 pr-4">
-      <h2 class="text-xl font-bold mb-4 dark:text-white">Tags</h2>
-      <div class="space-y-2">
-        <button
-          v-for="tag in uniqueTags"
-          :key="tag"
-          @click="filterByTag(tag)"
-          class="block w-full text-left px-3 py-2 rounded"
-          :class="selectedTag === tag ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'"
-        >
-          {{ tag }}
-        </button>
-      </div>
-    </div>
-
     <!-- Griglia dei video -->
-    <div class="w-3/4">
+    <div class="w-full">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
           <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover">
@@ -35,12 +19,12 @@
               </button>
             </div>
             <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">Duration: {{ formatDuration(video.duration) }}</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ video.transcript.substring(0, 100) }}...</p>
             <div class="flex flex-wrap mb-2">
-              <span v-for="tag in video.tags" :key="tag" class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-2">
+              <span v-for="tag in video.tags" :key="tag" class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">
                 {{ tag }}
               </span>
             </div>
+            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ video.transcript.substring(0, 100) }}...</p>
             <button @click="openVideoModal(video)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Play
             </button>
@@ -75,9 +59,9 @@ interface Video {
   transcript: string;
   videoUrl: string;
   thumbnailUrl: string;
-  tags: string[];
   preview?: string;
   currentTime?: number;
+  tags: string[];
 }
 
 export default defineComponent({
@@ -89,14 +73,16 @@ export default defineComponent({
     searchQuery: {
       type: String,
       default: ''
+    },
+    selectedTag: {
+      type: String,
+      default: null
     }
   },
   setup(props) {
     const videos = ref<Video[]>([]);
     const selectedVideo = ref<Video | null>(null);
     const favorites = ref<number[]>(JSON.parse(localStorage.getItem('favorites') || '[]'));
-    const allTags = ref<string[]>([]);
-    const selectedTag = ref<string | null>(null);
 
     const fetchVideos = async (query = '') => {
       try {
@@ -108,7 +94,6 @@ export default defineComponent({
         }));
         console.log(`Fetched ${videos.value.length} videos`);
         fetchPreviews();
-        fetchTags(); // Fetch tags after fetching videos
       } catch (error) {
         console.error('Error fetching videos:', error);
       }
@@ -128,24 +113,6 @@ export default defineComponent({
         }
       }
       console.log('All previews fetched');
-    };
-
-    const fetchTags = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/tags');
-        allTags.value = response.data;
-        console.log('Tags fetched:', allTags.value);
-      } catch (error) {
-        console.error('Errore nel recupero dei tag:', error);
-      }
-    };
-
-    const updateAllTags = () => {
-      const tagsSet = new Set<string>();
-      videos.value.forEach(video => {
-        video.tags.forEach(tag => tagsSet.add(tag));
-      });
-      allTags.value = Array.from(tagsSet);
     };
 
     const handleVideoUploaded = () => {
@@ -174,9 +141,11 @@ export default defineComponent({
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
+        (props.selectedTag ? video.tags.includes(props.selectedTag) : true) &&
         (video.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-        video.transcript.toLowerCase().includes(props.searchQuery.toLowerCase())) &&
-        (!selectedTag.value || video.tags.includes(selectedTag.value))
+         video.transcript.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+         video.tags.some((tag: string) => tag.toLowerCase().includes(props.searchQuery.toLowerCase()))
+        )
       );
     });
 
@@ -214,15 +183,6 @@ export default defineComponent({
       return favorites.value.includes(video.id);
     };
 
-    const filterByTag = (tag: string) => {
-      selectedTag.value = selectedTag.value === tag ? null : tag;
-    };
-
-    const uniqueTags = computed(() => {
-      const allTags = videos.value.flatMap(video => video.tags);
-      return [...new Set(allTags)];
-    });
-
     const updateVideoTime = (time: number) => {
       console.log('Updating video time:', time);
       if (selectedVideo.value) {
@@ -252,12 +212,8 @@ export default defineComponent({
       formatDuration,
       toggleFavorite,
       isFavorite,
-      allTags,
-      selectedTag,
-      filterByTag,
       fetchVideos,
       fetchPreviews,
-      uniqueTags,
       updateVideoTime,
       calculateProgress
     };

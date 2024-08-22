@@ -15,16 +15,6 @@ app.use(express.json());
 // Array per memorizzare i dati dei video
 let videos = [];
 
-// Set per memorizzare tutti i tag unici
-let allTags = new Set();
-
-// Funzione per aggiornare allTags
-const updateAllTags = (videoTags) => {
-  if (Array.isArray(videoTags)) {
-    videoTags.forEach(tag => allTags.add(tag));
-  }
-};
-
 // Funzione per generare ID unici
 const generateId = () => Date.now().toString() + Math.random().toString().slice(2);
 
@@ -84,7 +74,6 @@ const processVideo = (videoPath, thumbnailPath) => {
 const saveData = async () => {
   try {
     await fs.writeFile('data/videos.json', JSON.stringify(videos));
-    await fs.writeFile('data/tags.json', JSON.stringify(Array.from(allTags)));
     console.log('Data saved successfully');
   } catch (error) {
     console.error('Error saving data:', error);
@@ -95,22 +84,18 @@ const saveData = async () => {
 const loadData = async () => {
   try {
     const videosData = await fs.readFile('data/videos.json', 'utf8');
-    const tagsData = await fs.readFile('data/tags.json', 'utf8');
     videos = JSON.parse(videosData);
-    allTags = new Set(JSON.parse(tagsData));
     console.log('Data loaded successfully');
   } catch (error) {
     if (error.code === 'ENOENT') {
       console.log('No existing data found. Starting with empty data.');
       videos = [];
-      allTags = new Set();
       // Salva i file vuoti per evitare questo errore in futuro
       await saveData();
     } else {
       console.error('Error loading data:', error);
-      // Se c'è un altro tipo di errore, inizializza comunque con array/set vuoti
+      // Se c'è un altro tipo di errore, inizializza comunque con array vuoto
       videos = [];
-      allTags = new Set();
     }
   }
 };
@@ -157,7 +142,6 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     };
 
     videos.push(video);
-    updateAllTags(tags);
     await saveData();
     console.log('New video added:', video);
     res.status(200).json(video);
@@ -167,9 +151,18 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   }
 });
 
+// Endpoint per ottenere i video filtrati per tag
+app.get('/videos/bytag/:tag', (req, res) => {
+  const tag = req.params.tag;
+  const filteredVideos = videos.filter(video => video.tags.includes(tag));
+  res.json(filteredVideos);
+});
+
 // Endpoint per ottenere tutti i tag
 app.get('/tags', (req, res) => {
-  res.json(Array.from(allTags));
+  const allTags = videos.flatMap(video => video.tags);
+  const uniqueTags = [...new Set(allTags)];
+  res.json(uniqueTags);
 });
 
 // Endpoint per ottenere un video specifico
@@ -199,7 +192,6 @@ app.put('/videos/:id', async (req, res) => {
     tags: tags || videos[videoIndex].tags
   };
 
-  updateAllTags(videos[videoIndex].tags);
   await saveData();
   res.json(videos[videoIndex]);
 });

@@ -6,7 +6,8 @@
         <div class="p-4 mb-6">
           <img src="@/assets/logo.png" alt="Logo" class="w-32 mx-auto">
         </div>
-        <nav class="flex-grow space-y-4">
+        
+        <nav class="space-y-4">
           <router-link to="/" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -26,12 +27,44 @@
             Manage Videos
           </router-link>
         </nav>
-        <button @click="logout" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 mt-auto mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-          </svg>
-          Logout
-        </button>
+
+        <!-- Sezione Tag -->
+        <div class="px-4 mt-6 mb-4">
+          <h2 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+            </svg>
+            Tag
+          </h2>
+          <div class="border-t border-b border-gray-200 dark:border-gray-700 py-2">
+            <div class="max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+              <ul>
+                <li v-for="tag in uniqueTags" :key="tag" class="mb-1">
+                  <button 
+                    @click="toggleTagFilter(tag)"
+                    class="w-full text-left flex justify-between items-center py-1 px-2 rounded transition-colors duration-200"
+                    :class="{
+                      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': selectedTag === tag,
+                      'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-800': selectedTag !== tag
+                    }"
+                  >
+                    <span>{{ tag }}</span>
+                    <span v-if="selectedTag === tag" class="text-xs ml-2">&times;</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-auto">
+          <button @click="logout" class="flex items-center py-3 px-6 text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+            </svg>
+            Logout
+          </button>
+        </div>
       </div>
 
       <!-- Main content -->
@@ -68,7 +101,7 @@
               Upload Video
             </button>
           </div>
-          <router-view :searchQuery="searchQuery"></router-view>
+          <router-view :searchQuery="searchQuery" :selectedTag="selectedTag" @clearTagFilter="clearTagFilter"></router-view>
         </main>
       </div>
 
@@ -83,6 +116,7 @@ import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import UploadModal from '@/components/UploadModal.vue';
 import eventBus from '@/eventBus';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'App',
@@ -97,6 +131,9 @@ export default defineComponent({
     const isDarkMode = ref(localStorage.getItem('darkMode') === 'true');
     const userRole = ref(localStorage.getItem('userRole'));
     const username = ref(localStorage.getItem('username') || 'User');
+    const videos = ref<any[]>([]);
+    const uniqueTags = ref<string[]>([]);
+    const selectedTag = ref<string | null>(null);
 
     const isLoggedIn = computed(() => {
       return !!userRole.value;
@@ -142,12 +179,44 @@ export default defineComponent({
       }
     };
 
+    const fetchVideos = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/videos');
+        videos.value = response.data;
+      } catch (error) {
+        console.error('Errore nel recupero dei video:', error);
+      }
+    };
+
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/tags');
+        uniqueTags.value = response.data;
+      } catch (error) {
+        console.error('Errore nel recupero dei tag:', error);
+      }
+    };
+
+    const toggleTagFilter = (tag: string) => {
+      if (selectedTag.value === tag) {
+        selectedTag.value = null;
+      } else {
+        selectedTag.value = tag;
+      }
+    };
+
+    const clearTagFilter = () => {
+      selectedTag.value = null;
+    };
+
     onMounted(() => {
       window.addEventListener('userRole-changed', handleUserRoleChange as EventListener);
       window.addEventListener('darkMode-changed', handleDarkModeChange as EventListener);
       if (isDarkMode.value) {
         document.documentElement.classList.add('dark');
       }
+      fetchVideos();
+      fetchTags();
     });
 
     onUnmounted(() => {
@@ -165,7 +234,12 @@ export default defineComponent({
       handleVideoUploaded,
       isDarkMode,
       toggleDarkMode,
-      username
+      username,
+      videos,
+      uniqueTags,
+      selectedTag,
+      toggleTagFilter,
+      clearTagFilter
     };
   }
 });
@@ -177,4 +251,25 @@ export default defineComponent({
 @import 'tailwindcss/utilities';
 
 /* Puoi aggiungere stili globali qui se necessario */
+</style>
+
+<style scoped>
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
 </style>

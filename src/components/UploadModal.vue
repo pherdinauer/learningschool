@@ -12,16 +12,7 @@
             <input type="file" @change="handleFileChange" accept="video/*" class="mb-4">
             <input v-model="title" placeholder="Video Title" class="w-full p-2 mb-4 border rounded">
             <textarea v-model="transcript" placeholder="Video Transcript" class="w-full p-2 mb-4 border rounded" rows="4"></textarea>
-            <div class="flex mb-2">
-              <input v-model="tagInput" @keyup.enter.prevent="addTag" placeholder="Add tags (press Enter to add)" class="flex-grow p-2 border rounded-l">
-              <button @click="addTag" class="bg-blue-500 text-white px-4 rounded-r">Add Tag</button>
-            </div>
-            <div class="flex flex-wrap mb-4">
-              <span v-for="tag in tags" :key="tag" class="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2 mb-2">
-                {{ tag }}
-                <button @click="removeTag(tag)" class="ml-1 text-blue-600 hover:text-blue-800">&times;</button>
-              </span>
-            </div>
+            <Tag v-model:tags="tags" />
           </div>
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -41,15 +32,18 @@
 import { defineComponent, ref } from 'vue';
 import axios from 'axios';
 import eventBus from '@/eventBus';
+import Tag from '@/components/Tag.vue';
 
 export default defineComponent({
   name: 'UploadModal',
+  components: {
+    Tag
+  },
   emits: ['close', 'videoUploaded'],
   setup(props, { emit }) {
     const file = ref<File | null>(null);
     const title = ref('');
     const transcript = ref('');
-    const tagInput = ref('');
     const tags = ref<string[]>([]);
 
     const handleFileChange = (event: Event) => {
@@ -57,18 +51,6 @@ export default defineComponent({
       if (target.files) {
         file.value = target.files[0];
       }
-    };
-
-    const addTag = () => {
-      const newTag = tagInput.value.trim();
-      if (newTag && !tags.value.includes(newTag)) {
-        tags.value.push(newTag);
-        tagInput.value = '';
-      }
-    };
-
-    const removeTag = (tagToRemove: string) => {
-      tags.value = tags.value.filter(tag => tag !== tagToRemove);
     };
 
     const uploadVideo = async () => {
@@ -102,12 +84,9 @@ export default defineComponent({
     return {
       title,
       transcript,
-      tagInput,
       tags,
       handleFileChange,
-      uploadVideo,
-      addTag,
-      removeTag
+      uploadVideo
     };
   }
 });
