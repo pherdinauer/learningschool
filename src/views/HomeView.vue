@@ -61,8 +61,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
+import eventBus from '@/eventBus';
 
 interface Video {
   id: number;
@@ -72,6 +73,7 @@ interface Video {
   videoUrl: string;
   thumbnailUrl: string;
   tags: string[];
+  preview?: string;
 }
 
 export default defineComponent({
@@ -91,8 +93,11 @@ export default defineComponent({
 
     const fetchVideos = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/videos');
+        // Aggiungiamo un parametro timestamp per evitare il caching
+        const response = await axios.get(`http://localhost:3000/videos?t=${Date.now()}`);
         videos.value = response.data;
+        // Forza un aggiornamento del DOM
+        videos.value = [...videos.value];
         updateAllTags();
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -107,7 +112,21 @@ export default defineComponent({
       allTags.value = Array.from(tagsSet);
     };
 
-    onMounted(fetchVideos);
+    const handleVideoUploaded = () => {
+      // Aggiungiamo un breve ritardo prima di recuperare i video
+      setTimeout(() => {
+        fetchVideos();
+      }, 1000); // Ritardo di 1 secondo
+    };
+
+    onMounted(() => {
+      fetchVideos();
+      eventBus.$on('video-uploaded', handleVideoUploaded);
+    });
+
+    onUnmounted(() => {
+      eventBus.$off('video-uploaded', handleVideoUploaded);
+    });
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
@@ -166,7 +185,8 @@ export default defineComponent({
       isFavorite,
       allTags,
       selectedTag,
-      filterByTag
+      filterByTag,
+      fetchVideos
     };
   }
 });

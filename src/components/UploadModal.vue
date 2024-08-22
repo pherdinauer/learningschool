@@ -40,7 +40,8 @@
   <script lang="ts">
   import { defineComponent, ref } from 'vue';
   import axios from 'axios';
-  
+  import eventBus from '@/eventBus';
+
   export default defineComponent({
     name: 'UploadModal',
     emits: ['close', 'videoUploaded'],
@@ -50,7 +51,7 @@
       const transcript = ref('');
       const tagInput = ref('');
       const tags = ref<string[]>([]);
-  
+
       const handleFileChange = (event: Event) => {
         const target = event.target as HTMLInputElement;
         if (target.files) {
@@ -91,6 +92,7 @@
           console.log('Upload successful:', response.data);
           emit('videoUploaded');
           emit('close');
+          eventBus.$emit('video-uploaded');
         } catch (error) {
           console.error('Error uploading video:', error);
           alert('Error uploading video');
