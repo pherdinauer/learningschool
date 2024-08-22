@@ -117,11 +117,14 @@ const loadData = async () => {
 
 // Endpoint per ottenere tutti i video
 app.get('/videos', (req, res) => {
+  console.log('Richiesta ricevuta per /videos');
+  console.log(`Invio di ${videos.length} video`);
   res.json(videos);
 });
 
 // Endpoint per il caricamento dei video
 app.post('/upload', upload.single('video'), async (req, res) => {
+  console.log('Richiesta di upload video ricevuta');
   try {
     const { title, transcript } = req.body;
     let tags = [];
@@ -240,4 +243,16 @@ app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await createUploadDirectories();
   await loadData();
+});
+
+// Endpoint forzato per le anteprime
+app.get('/preview/:id', (req, res) => {
+  const id = req.params.id;
+  console.log(`Richiesta anteprima per il video con ID: ${id}`);
+  
+  // Creiamo un'anteprima fittizia
+  const preview = `Questa è un'anteprima fittizia per il video ${id}. In un'implementazione reale, qui ci sarebbe il vero contenuto dell'anteprima.`;
+  
+  console.log(`Invio anteprima per il video ${id}: ${preview.substring(0, 50)}...`);
+  res.json({ preview: preview });
 });

@@ -5,7 +5,7 @@
       <h2 class="text-xl font-bold mb-4 dark:text-white">Tags</h2>
       <div class="space-y-2">
         <button
-          v-for="tag in allTags"
+          v-for="tag in uniqueTags"
           :key="tag"
           @click="filterByTag(tag)"
           class="block w-full text-left px-3 py-2 rounded"
@@ -26,7 +26,7 @@
               <h3 class="font-bold text-xl mb-2 dark:text-white">{{ video.title }}</h3>
               <button @click.stop="toggleFavorite(video)" class="text-yellow-500 hover:text-yellow-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :fill="isFavorite(video) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784-.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
               </button>
             </div>
@@ -93,27 +93,43 @@ export default defineComponent({
 
     const fetchVideos = async (query = '') => {
       try {
-        // Aggiungiamo un parametro timestamp per evitare il caching
-        const response = await axios.get(`http://localhost:3000/videos?q=${query}&t=${Date.now()}`);
-        videos.value = response.data;
-        // Forza un aggiornamento del DOM
-        videos.value = [...videos.value];
-        updateAllTags();
-        fetchPreviews(); // Aggiungi questa chiamata
+        console.log('Fetching videos...');
+        const response = await axios.get(`http://localhost:3000/videos?t=${Date.now()}`);
+        videos.value = response.data.map((video: Video) => ({
+          ...video,
+          thumbnailUrl: `${video.thumbnailUrl}?t=${Date.now()}`
+        }));
+        console.log(`Fetched ${videos.value.length} videos`);
+        fetchPreviews();
+        fetchTags(); // Fetch tags after fetching videos
       } catch (error) {
         console.error('Error fetching videos:', error);
       }
     };
 
-    // Aggiungi questa nuova funzione
     const fetchPreviews = async () => {
-      try {
-        for (const video of videos.value) {
+      console.log('Fetching previews...');
+      for (const video of videos.value) {
+        try {
+          console.log(`Fetching preview for video ${video.id}...`);
           const response = await axios.get(`http://localhost:3000/preview/${video.id}`);
           video.preview = response.data.preview;
+          console.log(`Preview fetched for video ${video.id}`);
+        } catch (error) {
+          console.warn(`Impossibile caricare l'anteprima per il video ${video.id}:`, error);
+          video.preview = 'Anteprima non disponibile';
         }
+      }
+      console.log('All previews fetched');
+    };
+
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/tags');
+        allTags.value = response.data;
+        console.log('Tags fetched:', allTags.value);
       } catch (error) {
-        console.error('Error fetching previews:', error);
+        console.error('Errore nel recupero dei tag:', error);
       }
     };
 
@@ -126,10 +142,10 @@ export default defineComponent({
     };
 
     const handleVideoUploaded = () => {
-      // Aggiungiamo un breve ritardo prima di recuperare i video
+      console.log('Video uploaded, refreshing videos...');
       setTimeout(() => {
         fetchVideos();
-      }, 1000); // Ritardo di 1 secondo
+      }, 2000);
     };
 
     onMounted(() => {
@@ -144,6 +160,10 @@ export default defineComponent({
     watch(() => props.searchQuery, (newQuery) => {
       fetchVideos(newQuery);
     }, { immediate: true });
+
+    watch(() => videos.value, (newVideos) => {
+      console.log('Video aggiornati:', newVideos);
+    }, { deep: true });
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
@@ -189,6 +209,11 @@ export default defineComponent({
       selectedTag.value = selectedTag.value === tag ? null : tag;
     };
 
+    const uniqueTags = computed(() => {
+      const allTags = videos.value.flatMap(video => video.tags);
+      return [...new Set(allTags)];
+    });
+
     return { 
       filteredVideos, 
       selectedVideo, 
@@ -202,7 +227,8 @@ export default defineComponent({
       selectedTag,
       filterByTag,
       fetchVideos,
-      fetchPreviews // Aggiungi questa proprietà
+      fetchPreviews,
+      uniqueTags
     };
   }
 });

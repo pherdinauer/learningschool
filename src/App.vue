@@ -73,7 +73,7 @@
       </div>
 
       <!-- Upload Modal (for admin) -->
-      <UploadModal v-if="showUploadModal" @close="showUploadModal = false" @videoUploaded="onVideoUploaded" />
+      <UploadModal v-if="showUploadModal" @close="showUploadModal = false" @videoUploaded="handleVideoUploaded" />
     </div>
   </div>
 </template>
@@ -82,6 +82,7 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import UploadModal from '@/components/UploadModal.vue';
+import eventBus from '@/eventBus';
 
 export default defineComponent({
   name: 'App',
@@ -116,11 +117,9 @@ export default defineComponent({
       router.push('/login');
     };
 
-    const onVideoUploaded = () => {
-      showUploadModal.value = false;
-      if (router.currentRoute.value.name === 'Home') {
-        router.go(0);
-      }
+    const handleVideoUploaded = () => {
+      console.log('Video uploaded, emitting event...');
+      eventBus.$emit('video-uploaded');
     };
 
     const toggleDarkMode = () => {
@@ -161,9 +160,9 @@ export default defineComponent({
       isLoggedIn,
       isAdminUser,
       isLoginPage,
-      showUploadModal, 
+      showUploadModal,
       logout,
-      onVideoUploaded,
+      handleVideoUploaded,
       isDarkMode,
       toggleDarkMode,
       username
