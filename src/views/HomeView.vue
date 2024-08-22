@@ -21,6 +21,10 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
           <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover">
+          <!-- Barra di avanzamento -->
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
+            <div class="h-full bg-red-500" :style="{ width: `${calculateProgress(video)}%` }"></div>
+          </div>
           <div class="p-4">
             <div class="flex justify-between items-start">
               <h3 class="font-bold text-xl mb-2 dark:text-white">{{ video.title }}</h3>
@@ -230,6 +234,11 @@ export default defineComponent({
       }
     };
 
+    const calculateProgress = (video: Video) => {
+      if (!video.currentTime || !video.duration) return 0;
+      return (video.currentTime / video.duration) * 100;
+    };
+
     watch(selectedVideo, (newValue) => {
       console.log('selectedVideo changed:', newValue);
     });
@@ -249,7 +258,8 @@ export default defineComponent({
       fetchVideos,
       fetchPreviews,
       uniqueTags,
-      updateVideoTime
+      updateVideoTime,
+      calculateProgress
     };
   }
 });
