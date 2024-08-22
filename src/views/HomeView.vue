@@ -46,17 +46,13 @@
     </div>
 
     <!-- Video Modal -->
-    <div v-if="selectedVideo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full">
-        <h2 class="text-2xl font-bold mb-4 dark:text-white">{{ selectedVideo.title }}</h2>
-        <video :src="getFullUrl(selectedVideo.videoUrl)" controls class="w-full mb-4"></video>
-        <h3 class="text-xl font-semibold mb-2 dark:text-white">Transcript:</h3>
-        <p class="text-gray-700 dark:text-gray-300">{{ selectedVideo.transcript }}</p>
-        <button @click="closeVideoModal" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          Close
-        </button>
-      </div>
-    </div>
+    <VideoPlayer
+      v-if="selectedVideo"
+      :videoUrl="getFullUrl(selectedVideo.videoUrl)"
+      :videoTitle="selectedVideo.title"
+      :transcript="selectedVideo.transcript"
+      @close="closeVideoModal"
+    />
   </div>
 </template>
 
@@ -64,6 +60,7 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import eventBus from '@/eventBus';
+import VideoPlayer from './VideoPlayer.vue'; // Importa VideoPlayer
 
 interface Video {
   id: number;
@@ -74,10 +71,14 @@ interface Video {
   thumbnailUrl: string;
   tags: string[];
   preview?: string;
+  currentTime?: number;
 }
 
 export default defineComponent({
   name: 'HomeView',
+  components: {
+    VideoPlayer // Registra il componente
+  },
   props: {
     searchQuery: {
       type: String,
@@ -178,10 +179,12 @@ export default defineComponent({
     };
 
     const openVideoModal = (video: Video) => {
-      selectedVideo.value = video;
+      console.log('Opening video:', video);
+      selectedVideo.value = { ...video, currentTime: video.currentTime || 0 };
     };
 
     const closeVideoModal = () => {
+      console.log('Closing video modal');
       selectedVideo.value = null;
     };
 
@@ -214,6 +217,17 @@ export default defineComponent({
       return [...new Set(allTags)];
     });
 
+    const updateVideoTime = (time: number) => {
+      console.log('Updating video time:', time);
+      if (selectedVideo.value) {
+        selectedVideo.value.currentTime = time;
+        const index = videos.value.findIndex(v => v.id === selectedVideo.value?.id);
+        if (index !== -1) {
+          videos.value[index].currentTime = time;
+        }
+      }
+    };
+
     return { 
       filteredVideos, 
       selectedVideo, 
@@ -228,7 +242,8 @@ export default defineComponent({
       filterByTag,
       fetchVideos,
       fetchPreviews,
-      uniqueTags
+      uniqueTags,
+      updateVideoTime
     };
   }
 });
