@@ -1,8 +1,8 @@
 <template>
-  <div class="flex">
+  <div class="flex custom-scrollbar">
     <!-- Griglia dei video -->
-    <div class="w-full">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="w-full overflow-y-auto h-screen pb-20">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
           <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover">
           <!-- Barra di avanzamento -->
@@ -84,15 +84,16 @@ export default defineComponent({
     const selectedVideo = ref<Video | null>(null);
     const favorites = ref<number[]>(JSON.parse(localStorage.getItem('favorites') || '[]'));
 
-    const fetchVideos = async (query = '') => {
+    const fetchVideos = async () => {
       try {
         console.log('Fetching videos...');
         const response = await axios.get(`http://localhost:3000/videos?t=${Date.now()}`);
+        console.log('Response data:', response.data);
         videos.value = response.data.map((video: Video) => ({
           ...video,
           thumbnailUrl: `${video.thumbnailUrl}?t=${Date.now()}`
         }));
-        console.log(`Fetched ${videos.value.length} videos`);
+        console.log('Processed videos:', videos.value);
         fetchPreviews();
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -117,9 +118,7 @@ export default defineComponent({
 
     const handleVideoUploaded = () => {
       console.log('Video uploaded, refreshing videos...');
-      setTimeout(() => {
-        fetchVideos();
-      }, 2000);
+      fetchVideos();
     };
 
     onMounted(() => {
@@ -131,13 +130,9 @@ export default defineComponent({
       eventBus.$off('video-uploaded', handleVideoUploaded);
     });
 
-    watch(() => props.searchQuery, (newQuery) => {
-      fetchVideos(newQuery);
-    }, { immediate: true });
-
-    watch(() => videos.value, (newVideos) => {
-      console.log('Video aggiornati:', newVideos);
-    }, { deep: true });
+    watch(() => props.searchQuery, () => {
+      fetchVideos();
+    });
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
@@ -220,3 +215,32 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
+
+:global(.dark) .custom-scrollbar {
+  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+}
+
+:global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+</style>
