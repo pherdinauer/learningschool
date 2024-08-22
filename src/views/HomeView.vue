@@ -51,7 +51,9 @@
       :videoUrl="getFullUrl(selectedVideo.videoUrl)"
       :videoTitle="selectedVideo.title"
       :transcript="selectedVideo.transcript"
+      :currentTime="selectedVideo.currentTime || 0"
       @close="closeVideoModal"
+      @timeUpdate="updateVideoTime"
     />
   </div>
 </template>
@@ -227,6 +229,10 @@ export default defineComponent({
         }
       }
     };
+
+    watch(selectedVideo, (newValue) => {
+      console.log('selectedVideo changed:', newValue);
+    });
 
     return { 
       filteredVideos, 
