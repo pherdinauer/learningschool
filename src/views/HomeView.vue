@@ -1,10 +1,14 @@
 <template>
   <div class="flex custom-scrollbar">
-    <!-- Griglia dei video -->
     <div class="w-full overflow-y-auto h-screen pb-20">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
-          <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover">
+          <img 
+            :src="video.thumbnailUrl ? getThumbnailUrl(video) : placeholderImage" 
+            :alt="video.title"
+            class="w-full h-48 object-cover"
+            @error="handleImageError(video)"
+          >
           <!-- Barra di avanzamento -->
           <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
             <div class="h-full bg-red-500" :style="{ width: `${calculateProgress(video)}%` }"></div>
@@ -50,7 +54,7 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import eventBus from '@/eventBus';
-import VideoPlayer from './VideoPlayer.vue'; // Importa VideoPlayer
+import VideoPlayer from './VideoPlayer.vue';
 
 interface Video {
   id: number;
@@ -62,12 +66,13 @@ interface Video {
   preview?: string;
   currentTime?: number;
   tags: string[];
+  thumbnailVersion: number;
 }
 
 export default defineComponent({
   name: 'HomeView',
   components: {
-    VideoPlayer // Registra il componente
+    VideoPlayer
   },
   props: {
     searchQuery: {
@@ -83,17 +88,19 @@ export default defineComponent({
     const videos = ref<Video[]>([]);
     const selectedVideo = ref<Video | null>(null);
     const favorites = ref<number[]>(JSON.parse(localStorage.getItem('favorites') || '[]'));
+    const placeholderImage = ref('/path/to/placeholder-image.jpg'); // Sostituisci con il percorso della tua immagine placeholder
+    const baseUrl = 'http://localhost:3000';
 
     const fetchVideos = async () => {
       try {
         console.log('Fetching videos...');
-        const response = await axios.get(`http://localhost:3000/videos?t=${Date.now()}`);
-        console.log('Response data:', response.data);
+        const response = await axios.get(`${baseUrl}/videos`);
         videos.value = response.data.map((video: Video) => ({
           ...video,
-          thumbnailUrl: `${video.thumbnailUrl}?t=${Date.now()}`
+          thumbnailUrl: `${baseUrl}${video.thumbnailUrl}`, // Aggiungi il baseUrl all'inizio dell'URL della thumbnail
+          thumbnailVersion: Date.now() // Aggiungi un timestamp per forzare l'aggiornamento
         }));
-        console.log('Processed videos:', videos.value);
+        console.log(`Fetched ${videos.value.length} videos`);
         fetchPreviews();
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -105,7 +112,7 @@ export default defineComponent({
       for (const video of videos.value) {
         try {
           console.log(`Fetching preview for video ${video.id}...`);
-          const response = await axios.get(`http://localhost:3000/preview/${video.id}`);
+          const response = await axios.get(`${baseUrl}/preview/${video.id}`);
           video.preview = response.data.preview;
           console.log(`Preview fetched for video ${video.id}`);
         } catch (error) {
@@ -119,6 +126,30 @@ export default defineComponent({
     const handleVideoUploaded = () => {
       console.log('Video uploaded, refreshing videos...');
       fetchVideos();
+    };
+
+    const getThumbnailUrl = (video: Video) => {
+      return `${video.thumbnailUrl}?v=${video.thumbnailVersion}`;
+    };
+
+    const handleImageError = async (video: Video) => {
+      console.log(`Thumbnail not available for video ${video.id}, retrying...`);
+      let retries = 5;
+      while (retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Attendi 2 secondi
+        try {
+          const response = await axios.head(video.thumbnailUrl);
+          if (response.status === 200) {
+            console.log(`Thumbnail for video ${video.id} is now available`);
+            video.thumbnailVersion = Date.now(); // Forza l'aggiornamento dell'immagine
+            return;
+          }
+        } catch (error) {
+          console.log(`Retry failed for video ${video.id}, attempts left: ${retries}`);
+        }
+        retries--;
+      }
+      console.log(`Failed to load thumbnail for video ${video.id} after multiple attempts`);
     };
 
     onMounted(() => {
@@ -145,7 +176,7 @@ export default defineComponent({
     });
 
     const getFullUrl = (path: string) => {
-      return `http://localhost:3000${path}`;
+      return `${baseUrl}${path}`;
     };
 
     const openVideoModal = (video: Video) => {
@@ -210,7 +241,10 @@ export default defineComponent({
       fetchVideos,
       fetchPreviews,
       updateVideoTime,
-      calculateProgress
+      calculateProgress,
+      placeholderImage,
+      getThumbnailUrl,
+      handleImageError
     };
   }
 });
