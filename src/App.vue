@@ -157,6 +157,8 @@ export default defineComponent({
     const handleVideoUploaded = () => {
       console.log('Video uploaded, emitting event...');
       eventBus.$emit('video-uploaded');
+      fetchVideos();
+      fetchTags();
     };
 
     const toggleDarkMode = () => {
@@ -217,11 +219,16 @@ export default defineComponent({
       }
       fetchVideos();
       fetchTags();
+      eventBus.$on('video-uploaded', () => {
+        fetchVideos();
+        fetchTags();
+      });
     });
 
     onUnmounted(() => {
       window.removeEventListener('userRole-changed', handleUserRoleChange as EventListener);
       window.removeEventListener('darkMode-changed', handleDarkModeChange as EventListener);
+      eventBus.$off('video-uploaded');
     });
 
     return { 
