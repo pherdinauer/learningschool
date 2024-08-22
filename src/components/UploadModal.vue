@@ -11,15 +11,26 @@
           <div class="mt-4 space-y-4">
             <div class="flex items-center justify-center w-full">
               <label for="file-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
-                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <div v-if="!file" class="flex flex-col items-center justify-center pt-5 pb-6">
                   <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                   </svg>
                   <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Clicca per caricare</span> o trascina e rilascia</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">MP4, AVI, MOV (MAX. 800MB)</p>
                 </div>
-                <input id="file-upload" type="file" class="hidden" @change="handleFileChange" accept="video/*" />
+                <div v-else class="w-full px-4">
+                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ file.name }}</p>
+                  <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div 
+                      class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                      :class="{ 'bg-green-500': uploadProgress === 100 }"
+                      :style="{ width: `${uploadProgress}%` }"
+                    ></div>
+                  </div>
+                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ uploadProgress }}% caricato</p>
+                </div>
               </label>
+              <input id="file-upload" type="file" class="hidden" @change="handleFileChange" accept="video/*" />
             </div>
             <input v-model="title" placeholder="Titolo del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500">
             <textarea v-model="transcript" placeholder="Trascrizione del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500" rows="4"></textarea>
@@ -71,6 +82,12 @@ import { defineComponent, ref } from 'vue';
 import axios from 'axios';
 import eventBus from '@/eventBus';
 
+// Definiamo un'interfaccia per l'evento di progresso
+interface ProgressEvent {
+  loaded: number;
+  total?: number;
+}
+
 export default defineComponent({
   name: 'UploadModal',
   emits: ['close', 'videoUploaded'],
@@ -80,11 +97,13 @@ export default defineComponent({
     const transcript = ref('');
     const tags = ref<string[]>([]);
     const newTag = ref('');
+    const uploadProgress = ref(0);
 
     const handleFileChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       if (target.files) {
         file.value = target.files[0];
+        uploadProgress.value = 0; // Resetta il progresso quando viene selezionato un nuovo file
       }
     };
 
@@ -115,6 +134,11 @@ export default defineComponent({
         const response = await axios.post('http://localhost:3000/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent: ProgressEvent) => {
+            if (progressEvent.total) {
+              uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            }
           }
         });
         console.log('Upload successful:', response.data);
@@ -128,10 +152,12 @@ export default defineComponent({
     };
 
     return {
+      file,
       title,
       transcript,
       tags,
       newTag,
+      uploadProgress,
       handleFileChange,
       addTag,
       removeTag,
