@@ -91,10 +91,10 @@ export default defineComponent({
     const allTags = ref<string[]>([]);
     const selectedTag = ref<string | null>(null);
 
-    const fetchVideos = async () => {
+    const fetchVideos = async (query = '') => {
       try {
         // Aggiungiamo un parametro timestamp per evitare il caching
-        const response = await axios.get(`http://localhost:3000/videos?t=${Date.now()}`);
+        const response = await axios.get(`http://localhost:3000/videos?q=${query}&t=${Date.now()}`);
         videos.value = response.data;
         // Forza un aggiornamento del DOM
         videos.value = [...videos.value];
@@ -127,6 +127,10 @@ export default defineComponent({
     onUnmounted(() => {
       eventBus.$off('video-uploaded', handleVideoUploaded);
     });
+
+    watch(() => props.searchQuery, (newQuery) => {
+      fetchVideos(newQuery);
+    }, { immediate: true });
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
@@ -171,8 +175,6 @@ export default defineComponent({
     const filterByTag = (tag: string) => {
       selectedTag.value = selectedTag.value === tag ? null : tag;
     };
-
-    watch(() => props.searchQuery, fetchVideos);
 
     return { 
       filteredVideos, 
