@@ -99,8 +99,21 @@ export default defineComponent({
         // Forza un aggiornamento del DOM
         videos.value = [...videos.value];
         updateAllTags();
+        fetchPreviews(); // Aggiungi questa chiamata
       } catch (error) {
         console.error('Error fetching videos:', error);
+      }
+    };
+
+    // Aggiungi questa nuova funzione
+    const fetchPreviews = async () => {
+      try {
+        for (const video of videos.value) {
+          const response = await axios.get(`http://localhost:3000/preview/${video.id}`);
+          video.preview = response.data.preview;
+        }
+      } catch (error) {
+        console.error('Error fetching previews:', error);
       }
     };
 
@@ -188,7 +201,8 @@ export default defineComponent({
       allTags,
       selectedTag,
       filterByTag,
-      fetchVideos
+      fetchVideos,
+      fetchPreviews // Aggiungi questa proprietà
     };
   }
 });
