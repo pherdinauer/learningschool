@@ -2,7 +2,7 @@
   <div class="flex custom-scrollbar">
     <div class="w-full overflow-y-auto h-screen pb-20">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        <div v-for="video in filteredVideos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden relative">
+        <div v-for="video in filteredVideos" :key="video.id" class="custom-card rounded-lg shadow-md overflow-hidden relative">
           <img 
             :src="video.thumbnailUrl ? getThumbnailUrl(video) : placeholderImage" 
             :alt="video.title"
@@ -10,25 +10,25 @@
             @error="handleImageError(video)"
           >
           <!-- Barra di avanzamento -->
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-600">
             <div class="h-full bg-red-500" :style="{ width: `${calculateProgress(video)}%` }"></div>
           </div>
           <div class="p-4">
             <div class="flex justify-between items-start">
-              <h3 class="font-bold text-xl mb-2 dark:text-white">{{ video.title }}</h3>
+              <h3 class="font-bold text-xl mb-2 text-white">{{ video.title }}</h3>
               <button @click.stop="toggleFavorite(video)" class="text-yellow-500 hover:text-yellow-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :fill="isFavorite(video) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784-.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
               </button>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">Duration: {{ formatDuration(video.duration) }}</p>
+            <p class="text-gray-300 text-sm mb-2">Duration: {{ formatDuration(video.duration) }}</p>
             <div class="flex flex-wrap mb-2">
-              <span v-for="tag in video.tags" :key="tag" class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+              <span v-for="tag in video.tags" :key="tag" class="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded mr-1 mb-1">
                 {{ tag }}
               </span>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ video.transcript.substring(0, 100) }}...</p>
+            <p class="text-gray-300 text-sm mb-4">{{ video.transcript.substring(0, 100) }}...</p>
             <button @click="openVideoModal(video)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Play
             </button>
@@ -251,6 +251,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.custom-card {
+  background-color: #3e4756;
+}
+
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
