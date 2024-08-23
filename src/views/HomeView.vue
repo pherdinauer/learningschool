@@ -4,6 +4,7 @@
       <Cards 
         :videos="filteredVideos" 
         :baseUrl="baseUrl"
+        :favorites="favorites"
         @toggle-favorite="toggleFavorite"
         @open-video-modal="openVideoModal"
       />
@@ -23,8 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import eventBus from '@/eventBus';
+import { defineComponent, ref, computed, onMounted, watch } from 'vue';
 import VideoPlayer from './VideoPlayer.vue';
 import Cards from '@/components/Cards.vue';
 
@@ -33,7 +33,6 @@ interface Video {
   title: string;
   videoUrl: string;
   thumbnailUrl: string;
-  thumbnailVersion?: number;
   duration: number;
   tags: string[];
   transcript: string;
@@ -106,6 +105,11 @@ export default defineComponent({
     const updateVideoTime = (time: number) => {
       if (selectedVideo.value) {
         selectedVideo.value.currentTime = time;
+        // Aggiorna anche il video nell'array videos
+        const index = videos.value.findIndex(v => v.id === selectedVideo.value!.id);
+        if (index !== -1) {
+          videos.value[index].currentTime = time;
+        }
       }
     };
 
@@ -116,14 +120,7 @@ export default defineComponent({
       return `${baseUrl}${url}`;
     };
 
-    onMounted(() => {
-      fetchVideos();
-      eventBus.$on('video-uploaded', fetchVideos);
-    });
-
-    onUnmounted(() => {
-      eventBus.$off('video-uploaded', fetchVideos);
-    });
+    onMounted(fetchVideos);
 
     watch(() => props.searchQuery, fetchVideos);
 
@@ -136,6 +133,7 @@ export default defineComponent({
       toggleFavorite,
       updateVideoTime,
       baseUrl,
+      favorites,
     };
   }
 });

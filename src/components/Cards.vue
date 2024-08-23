@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 interface Video {
   id: string;
@@ -68,6 +68,10 @@ export default defineComponent({
     baseUrl: {
       type: String,
       required: true
+    },
+    favorites: {
+      type: Array as PropType<string[]>,
+      required: true
     }
   },
   emits: ['open-video-modal', 'toggle-favorite'],
@@ -84,10 +88,10 @@ export default defineComponent({
       video.thumbnailUrl = '/path/to/placeholder-image.jpg';
     };
 
-    const formatDuration = (seconds: number) => {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.floor(seconds % 60);
-      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    const formatDuration = (duration: number) => {
+      const minutes = Math.floor(duration / 60);
+      const seconds = Math.floor(duration % 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
     const openVideoModal = (video: Video) => {
@@ -99,8 +103,7 @@ export default defineComponent({
     };
 
     const isFavorite = (video: Video) => {
-      // Questa logica potrebbe dover essere implementata nel componente genitore
-      return false; // Placeholder
+      return props.favorites.includes(video.id);
     };
 
     const calculateProgress = (video: Video) => {
