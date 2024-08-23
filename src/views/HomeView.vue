@@ -29,9 +29,17 @@
               </span>
             </div>
             <p class="text-gray-300 text-sm mb-4">{{ video.transcript.substring(0, 100) }}...</p>
-            <button @click="openVideoModal(video)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Play
-            </button>
+            <div class="flex items-center justify-between mt-4">
+              <button @click="openVideoModal(video)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Play
+              </button>
+              <div v-if="isVideoCompleted(video)" class="flex items-center text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-sm font-medium">Completed</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -225,6 +233,11 @@ export default defineComponent({
       return (video.currentTime / video.duration) * 100;
     };
 
+    const isVideoCompleted = (video: Video) => {
+      const progress = calculateProgress(video);
+      return progress >= 90;
+    };
+
     watch(selectedVideo, (newValue) => {
       console.log('selectedVideo changed:', newValue);
     });
@@ -244,7 +257,8 @@ export default defineComponent({
       calculateProgress,
       placeholderImage,
       getThumbnailUrl,
-      handleImageError
+      handleImageError,
+      isVideoCompleted
     };
   }
 });
