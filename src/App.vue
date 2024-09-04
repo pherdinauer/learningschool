@@ -40,7 +40,7 @@
           <div class="py-3 px-6">
             <h2 class="text-lg font-semibold mb-2 text-white flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
               </svg>
               <span v-if="!isCollapsed">Tag</span>
             </h2>
@@ -86,12 +86,7 @@
               </p>
             </div>
             <div class="flex items-center space-x-4">
-              <input 
-                type="text" 
-                v-model="searchQuery" 
-                placeholder="Search videos..." 
-                class="px-3 py-2 border rounded-md bg-gray-700 text-white border-gray-600 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+              <SearchBar v-model:searchQuery="searchQuery" />
               <!-- Dark mode toggle button -->
               <button @click="toggleDarkMode" class="btn-menu-transparent">
                 <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,11 +125,13 @@ import { useRouter, useRoute } from 'vue-router';
 import UploadModal from '@/components/UploadModal.vue';
 import eventBus from '@/eventBus';
 import axios from 'axios';
+import SearchBar from '@/components/SearchBar.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
-    UploadModal
+    UploadModal,
+    SearchBar
   },
   setup() {
     const router = useRouter();

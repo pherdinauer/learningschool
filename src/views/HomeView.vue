@@ -77,8 +77,8 @@ export default defineComponent({
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
         (props.selectedTag ? video.tags.includes(props.selectedTag) : true) &&
-        (video.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-         video.transcript.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+        (video.transcript.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+         video.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
          video.tags.some(tag => tag.toLowerCase().includes(props.searchQuery.toLowerCase()))
         )
       );
