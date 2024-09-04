@@ -26,12 +26,28 @@
     </div>
 
     <!-- Modal per la riproduzione del video -->
-    <div v-if="selectedVideo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg max-w-3xl w-full">
-        <VideoPlayer :videoUrl="getFullUrl(selectedVideo.videoUrl)" />
-        <button @click="selectedVideo = null" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-          Chiudi
-        </button>
+    <div v-if="selectedVideo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeVideoModal">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg w-3/4 h-3/4 flex flex-col">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{{ selectedVideo.title }}</h2>
+        <div class="video-player mb-4 flex-grow">
+          <video
+            ref="videoRef"
+            :src="getFullUrl(selectedVideo.videoUrl)"
+            @timeupdate="updateVideoTime"
+            @ended="onVideoEnded"
+            class="w-full h-full object-contain"
+            controls
+          ></video>
+        </div>
+        <div class="transcript-container mb-4 h-1/4 overflow-y-auto">
+          <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Transcript</h3>
+          <p class="text-gray-700 dark:text-gray-300">{{ selectedVideo.transcript }}</p>
+        </div>
+        <div class="flex justify-end">
+          <button @click="closeVideoModal" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Close
+          </button>
+        </div>
       </div>
     </div>
 
@@ -128,9 +144,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
-import VideoPlayer from './VideoPlayer.vue';
 import { useRouter } from 'vue-router';
 
 interface Video {
@@ -141,13 +156,11 @@ interface Video {
   videoUrl: string;
   transcript: string;
   tags: string[];
+  currentTime?: number;
 }
 
 export default defineComponent({
   name: 'VideoManagementView',
-  components: {
-    VideoPlayer
-  },
   setup() {
     const router = useRouter();
     const videos = ref<Video[]>([]);
@@ -156,6 +169,8 @@ export default defineComponent({
     const editingVideo = ref<Video | null>(null);
     const newTag = ref('');
     const baseUrl = 'http://localhost:3000';
+    const isPlaying = ref(true);
+    const videoRef = ref<HTMLVideoElement | null>(null);
 
     const isAdminUser = computed(() => {
       return localStorage.getItem('userRole') === 'admin';
@@ -168,6 +183,11 @@ export default defineComponent({
         return;
       }
       fetchVideos();
+      window.addEventListener('keydown', handleKeyPress);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('keydown', handleKeyPress);
     });
 
     const fetchVideos = async () => {
@@ -246,15 +266,51 @@ export default defineComponent({
       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    const playVideo = (video: Video) => {
-      selectedVideo.value = video;
-    };
-
     const getFullUrl = (url: string) => {
       if (url.startsWith('http')) {
         return url;
       }
       return `${baseUrl}${url}`;
+    };
+
+    const updateVideoTime = (event: Event) => {
+      const video = event.target as HTMLVideoElement;
+      if (selectedVideo.value) {
+        selectedVideo.value.currentTime = video.currentTime;
+      }
+    };
+
+    const onVideoEnded = () => {
+      isPlaying.value = false;
+    };
+
+    const playVideo = (video: Video) => {
+      selectedVideo.value = { ...video, currentTime: video.currentTime || 0 };
+      isPlaying.value = true;
+    };
+
+    const closeVideoModal = () => {
+      selectedVideo.value = null;
+      isPlaying.value = false;
+    };
+
+    const togglePlayPause = () => {
+      if (videoRef.value) {
+        if (videoRef.value.paused) {
+          videoRef.value.play();
+          isPlaying.value = true;
+        } else {
+          videoRef.value.pause();
+          isPlaying.value = false;
+        }
+      }
+    };
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === 'Space' && selectedVideo.value) {
+        event.preventDefault();
+        togglePlayPause();
+      }
     };
 
     return {
@@ -264,6 +320,8 @@ export default defineComponent({
       formatDuration,
       selectedVideo,
       playVideo,
+      closeVideoModal,
+      updateVideoTime,
       getFullUrl,
       editVideo,
       editingVideo,
@@ -272,7 +330,11 @@ export default defineComponent({
       newTag,
       addTag,
       removeTag,
-      isAdminUser
+      isAdminUser,
+      isPlaying,
+      videoRef,
+      togglePlayPause,
+      onVideoEnded
     };
   }
 });

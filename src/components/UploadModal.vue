@@ -43,32 +43,34 @@
               />
               <button
                 @click="addTag"
-                class="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800"
+                class="btn-secondary btn-sm"
               >
                 Aggiungi
               </button>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap mt-2">
               <span
                 v-for="(tag, index) in tags"
                 :key="index"
-                class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-md flex items-center"
+                class="tag flex items-center"
               >
                 {{ tag }}
-                <button @click="removeTag(index)" class="ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
+                <button
+                  @click="removeTag(index)"
+                  class="ml-1 text-xs font-bold hover:text-red-500 transition-colors duration-300"
+                  aria-label="Rimuovi tag"
+                >
+                  &times;
                 </button>
               </span>
             </div>
           </div>
         </div>
         <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button @click="uploadVideo" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm dark:bg-blue-700 dark:hover:bg-blue-800">
-            Carica
+          <button @click="uploadVideo" type="button" class="btn-primary w-full sm:w-auto sm:ml-3 py-1 px-2 text-sm">
+            Carica Video
           </button>
-          <button @click="$emit('close')" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+          <button @click="$emit('close')" type="button" class="btn-secondary w-full sm:w-auto mt-3 sm:mt-0">
             Annulla
           </button>
         </div>
@@ -166,3 +168,62 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+.btn {
+  font-weight: bold;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 0.25rem;
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  font-weight: bold;
+  background-color: var(--color-secondary);
+  color: white;
+  border-radius: 0.25rem;
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-dark);
+}
+
+.btn-tertiary {
+  font-weight: bold;
+  background-color: var(--color-tertiary);
+  color: white;
+  border-radius: 0.25rem;
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+}
+
+.btn-tertiary:hover {
+  background-color: var(--color-tertiary-dark);
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+}
+
+.tag {
+  background-color: var(--color-tertiary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition-property: color, background-color, border-color;
+  transition-duration: 300ms;
+}
+</style>
