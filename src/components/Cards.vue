@@ -1,44 +1,30 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-    <div v-for="video in videos" :key="video.id" class="custom-card rounded-lg shadow-md overflow-hidden relative bg-white dark:bg-gray-800 w-80">
-      <img 
-        :src="getFullUrl(video.thumbnailUrl)" 
-        :alt="video.title"
-        class="w-full h-48 object-cover cursor-pointer"
-        @click="openVideoModal(video)"
-        @error="handleImageError(video)"
-      >
-      <!-- Barra di avanzamento -->
-      <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-300">
-        <div class="h-full bg-primary" :style="{ width: `${calculateProgress(video)}%` }"></div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+    <div v-for="video in videos" :key="video.id" class="custom-card rounded-lg shadow-md overflow-hidden relative bg-white dark:bg-gray-800">
+      <div class="relative">
+        <img :src="getFullUrl(video.thumbnailUrl)" alt="Video thumbnail" class="w-full h-40 object-cover">
+        <div class="absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-50 text-white text-xs px-2 py-1">
+          {{ formatDuration(video.duration) }}
+        </div>
+        <div v-if="isCompleted(video)" class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+          Completed
+        </div>
+        <button @click="$emit('open-video-modal', video)" class="absolute inset-0 w-full h-full opacity-0 hover:opacity-100 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
       </div>
-      <div class="p-4 flex flex-col h-64">
-        <div class="flex justify-between items-start mb-2">
-          <h3 class="font-bold text-lg text-secondary dark:text-tertiary line-clamp-2 break-words flex-grow">{{ video.title || '\u00A0' }}</h3>
-          <button @click.stop="toggleFavorite(video)" class="text-yellow-500 hover:text-yellow-600 ml-2 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :fill="isFavorite(video) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784-.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-          </button>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold mb-2 line-clamp-2">{{ video.title }}</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-3">{{ video.transcript }}</p>
+        <div class="flex flex-wrap mb-2">
+          <span v-for="tag in video.tags.slice(0, 4)" :key="tag" class="tag mr-1 mb-1">{{ tag }}</span>
         </div>
-        <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">Duration: {{ formatDuration(video.duration) }}</p>
-        <p class="text-gray-600 dark:text-gray-300 text-sm mb-2 line-clamp-4 h-24 break-words">{{ video.transcript || '\u00A0' }}</p>
-        <div class="flex flex-wrap mb-2 h-8 overflow-hidden">
-          <span v-for="(tag, index) in video.tags.slice(0, 4)" :key="tag" class="tag">
-            {{ tag }}
-          </span>
-        </div>
-        <div class="flex items-center justify-between mt-auto">
-          <button @click="openVideoModal(video)" class="btn btn-primary btn-sm">
-            Play
-          </button>
-          <div v-if="isVideoCompleted(video)" class="flex items-center text-green-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            <span class="text-sm font-medium">Completed</span>
-          </div>
-        </div>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0">
+        <div class="bg-blue-500 h-1" :style="{ width: `${getProgressPercentage(video)}%` }"></div>
       </div>
     </div>
   </div>
@@ -50,11 +36,11 @@ import { defineComponent, PropType } from 'vue';
 interface Video {
   id: string;
   title: string;
+  videoUrl: string;
   thumbnailUrl: string;
   duration: number;
   tags: string[];
   transcript: string;
-  videoUrl: string;
   currentTime?: number;
 }
 
@@ -68,14 +54,10 @@ export default defineComponent({
     baseUrl: {
       type: String,
       required: true
-    },
-    favorites: {
-      type: Array as PropType<string[]>,
-      required: true
     }
   },
-  emits: ['open-video-modal', 'toggle-favorite'],
-  setup(props, { emit }) {
+  emits: ['open-video-modal'],
+  setup(props) {
     const getFullUrl = (url: string) => {
       if (url.startsWith('http')) {
         return url;
@@ -83,48 +65,27 @@ export default defineComponent({
       return `${props.baseUrl}${url}`;
     };
 
-    const handleImageError = (video: Video) => {
-      console.log(`Thumbnail not available for video ${video.id}, using placeholder...`);
-      video.thumbnailUrl = '/path/to/placeholder-image.jpg';
+    const formatDuration = (seconds: number) => {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    const formatDuration = (duration: number) => {
-      const minutes = Math.floor(duration / 60);
-      const seconds = Math.floor(duration % 60);
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    const openVideoModal = (video: Video) => {
-      emit('open-video-modal', video);
-    };
-
-    const toggleFavorite = (video: Video) => {
-      emit('toggle-favorite', video);
-    };
-
-    const isFavorite = (video: Video) => {
-      return props.favorites.includes(video.id);
-    };
-
-    const calculateProgress = (video: Video) => {
-      if (!video.duration || !video.currentTime) return 0;
+    const getProgressPercentage = (video: Video) => {
+      if (!video.currentTime || !video.duration) return 0;
       return (video.currentTime / video.duration) * 100;
     };
 
-    const isVideoCompleted = (video: Video) => {
-      const progress = calculateProgress(video);
-      return progress >= 90;
+    const isCompleted = (video: Video) => {
+      if (!video.currentTime || !video.duration) return false;
+      return (video.currentTime / video.duration) >= 0.9;
     };
 
     return {
       getFullUrl,
-      handleImageError,
       formatDuration,
-      openVideoModal,
-      toggleFavorite,
-      isFavorite,
-      calculateProgress,
-      isVideoCompleted
+      getProgressPercentage,
+      isCompleted
     };
   }
 });
@@ -132,79 +93,33 @@ export default defineComponent({
 
 <style scoped>
 .custom-card {
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  height: 28rem; /* 448px */
-}
-
-.dark .custom-card {
-  background-color: #1a202c;
-  border-color: #4a5568;
+  width: calc(100% - 1rem);
+  max-width: 280px;
+  margin: 0 auto;
+  height: 22rem;
 }
 
 .line-clamp-2 {
   display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   line-clamp: 2;
-  overflow: hidden;
 }
 
-.line-clamp-4 {
+.line-clamp-3 {
   display: -webkit-box;
-  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  line-clamp: 4;
   overflow: hidden;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
-.break-words {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
-.btn-sm {
-  padding-top: 0.25rem;    /* py-1 */
-  padding-bottom: 0.25rem; /* py-1 */
-  padding-left: 0.5rem;    /* px-2 */
-  padding-right: 0.5rem;   /* px-2 */
-  font-size: 0.875rem;     /* text-sm */
-}
-
-.btn-primary {
-  /* Definisci qui gli stili di base per btn-primary */
-  background-color: var(--color-primary);
+.tag {
+  background-color: #3b82f6;
   color: white;
-  font-weight: bold;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.btn {
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  transition: background-color 300ms, opacity 300ms;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background-color: var(--color-primary, #3490dc);
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-dark, #2779bd);
-}
-
-.btn-sm {
+  font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 9999px;
 }
 </style>

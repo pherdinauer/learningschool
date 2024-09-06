@@ -1,95 +1,230 @@
 <template>
-  <div class="search-bar flex flex-col items-center">
-    <div class="flex items-center w-full">
-      <input 
-        type="text" 
-        v-model="localSearchQuery"
-        @input="emitSearch"
-        placeholder="Cerca video..."
-        class="flex-grow px-4 py-2 rounded-l-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-      <button 
-        @click="askAI"
-        class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        AI
-      </button>
-    </div>
-    <div v-if="showAIResponse" class="mt-4 p-4 bg-white dark:bg-gray-800 rounded-md shadow-md w-full max-w-2xl relative">
-      <button 
-        @click="closeAIResponse" 
-        class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+  <div class="relative w-96">
+    <input
+      type="text"
+      v-model="localSearchQuery"
+      @input="updateSearchQuery"
+      @keyup.enter="handleSearch"
+      class="w-full py-2 px-4 pr-20 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="Cerca tra i video o chiedi all'IA"
+    >
+    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+      <button @click="handleSearch" class="p-1 focus:outline-none focus:shadow-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
         </svg>
       </button>
-      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Risposta AI:</h3>
-      <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ aiResponse }}</p>
+      <button @click="askAI" class="ai-button ml-2 px-2 py-1 rounded-md focus:outline-none focus:shadow-outline" :class="{ 'ai-button-active': isAIActive }">
+        IA
+      </button>
+    </div>
+    
+    <!-- AI Response Box -->
+    <div v-if="showAIResponse" class="ai-response-box">
+      <button @click="closeAIResponse" class="close-button">&times;</button>
+      <h3 class="response-title">Risposta dell'IA</h3>
+      <div class="response-content" v-html="formattedAIResponse"></div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 
 export default defineComponent({
   name: 'SearchBar',
   props: {
     searchQuery: {
       type: String,
-      default: ''
+      required: true
     }
   },
-  emits: ['update:searchQuery'],
+  emits: ['update:searchQuery', 'search'],
   setup(props, { emit }) {
     const localSearchQuery = ref(props.searchQuery);
     const showAIResponse = ref(false);
     const aiResponse = ref('');
+    const isTyping = ref(false);
+    const isAIActive = ref(false);
 
-    watch(() => props.searchQuery, (newValue) => {
-      localSearchQuery.value = newValue;
-    });
-
-    const emitSearch = () => {
+    const updateSearchQuery = () => {
       emit('update:searchQuery', localSearchQuery.value);
     };
 
-    const askAI = () => {
-      if (!localSearchQuery.value) return;
+    const handleSearch = () => {
+      emit('search', localSearchQuery.value);
+    };
 
-      // Mock della risposta AI
-      if (localSearchQuery.value.toLowerCase().includes('come modificare i parametri di sistema dell\'lcms')) {
-        aiResponse.value = "Purtroppo non esiste ancora un tutorial a riguardo, tuttavia proverò a fornirti una risposta valida.\n\nPer cambiare i parametri di sistema devi effettuare l'accesso con un account amministratore. Successivamente devi cliccare su Administration e su System Parameters.\n\nIn questa schermata avrai accesso ai parametri di sistema di LCMS.";
-      } else {
-        aiResponse.value = "Mi dispiace, non ho informazioni specifiche su questa richiesta. Posso aiutarti con qualcos'altro?";
-      }
+    const askAI = () => {
+      isAIActive.value = true;
       showAIResponse.value = true;
+      isTyping.value = true;
+      aiResponse.value = '';
+      
+      const response = `Mi dispiace, purtroppo non è presente un video tutorial a riguardo; tuttavia cercherò di fornirti una risposta esaustiva!
+
+Per modificare i parametri di sistema dell'LCMS, segui questi passaggi:
+
+1. Effettua il Login con un account Amministratore.
+
+2. Dopo il Login, clicca su "Administration" in basso a sinistra.
+
+3. Una volta nel pannello di amministrazione, seleziona la tab "Impostazioni di Sistema".
+
+4. Da qui dovresti riuscire a modificare le impostazioni di sistema.
+
+Spero che queste istruzioni ti siano d'aiuto. Se hai bisogno di ulteriori chiarimenti, non esitare a chiedere!`;
+
+      let i = 0;
+      const intervalId = setInterval(() => {
+        if (i < response.length) {
+          aiResponse.value += response[i];
+          i++;
+        } else {
+          clearInterval(intervalId);
+          isTyping.value = false;
+          setTimeout(() => {
+            isAIActive.value = false;
+          }, 300);
+        }
+      }, 30);
     };
 
     const closeAIResponse = () => {
       showAIResponse.value = false;
       aiResponse.value = '';
-      localSearchQuery.value = '';
-      emit('update:searchQuery', '');
     };
+
+    const formattedAIResponse = computed(() => {
+      if (isTyping.value) {
+        return aiResponse.value.replace(/\n/g, '<br>');
+      } else {
+        return aiResponse.value.replace(/\n/g, '<br>') + '<span class="cursor">|</span>';
+      }
+    });
 
     return {
       localSearchQuery,
-      emitSearch,
+      updateSearchQuery,
+      handleSearch,
       askAI,
       showAIResponse,
       aiResponse,
-      closeAIResponse
+      isTyping,
+      closeAIResponse,
+      isAIActive,
+      formattedAIResponse
     };
   }
 });
 </script>
 
 <style scoped>
-.search-bar {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+.ai-button {
+  background: linear-gradient(145deg, #3490dc, #2779bd);
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.ai-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ai-button:active, .ai-button-active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(50, 50, 93, 0.1), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.ai-response-box {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 90%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.response-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+}
+
+.response-content {
+  color: #4a5568;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.cursor {
+  animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Stili per la modalità dark */
+:global(.dark) .ai-response-box {
+  background: rgba(26, 32, 44, 0.9);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark) .close-button {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+:global(.dark) .close-button:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+:global(.dark) .response-title {
+  color: #e2e8f0;
+}
+
+:global(.dark) .response-content {
+  color: #a0aec0;
 }
 </style>
