@@ -1,0 +1,21 @@
+.completed-sign {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(0 220 0);
+  background-color: transparent;
+  color: rgb(0 220 0);
+  border-radius: 0.5rem;
+  padding-right: 5px;
+  padding-left: 5px;
+  font-size: 0.8rem;
+  svg {
+    * {
+      stroke: rgb(0 220 0);
+    }
+  }
+}
+
+.status-tag-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
