@@ -77,7 +77,7 @@
                 <img src="./assets/avatar.png" class="avatar" alt="Avatar" />
                 <p class="text-gray-300">
                   Welcome, <br />{{ isAdminUser ? "Admin" : "User" }}
-                  {{ username }}
+                  {{ "Valerio" }}
                 </p>
               </div>
             </div>
