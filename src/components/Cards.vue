@@ -8,7 +8,7 @@
       class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-300 dark:border-gray-600"
     >
       <div
-        class="relative cursor-pointer"
+        class="relative cursor-pointer card-top"
         @click="$emit('open-video-modal', video)"
       >
         <img
@@ -41,7 +41,7 @@
           </svg>
         </div>
       </div>
-      <div class="p-2">
+      <div class="p-2 card-bottom">
         <div class="top-wrapper">
           <h3
             class="text-sm font-semibold mb-1 text-gray-900 dark:text-white line-clamp-2"
@@ -58,6 +58,7 @@
               class="h-6 w-6"
               viewBox="0 0 20 20"
               :fill="isFavorite(video) ? '#ffc356' : 'none'"
+              stroke="#ffc356"
             >
               <path
                 data-v-7a7a37b1=""

@@ -15,8 +15,22 @@
   }
 }
 
-.status-tag-wrapper,
-.top-wrapper {
+.card-top,
+.card-bottom {
+  height: 50%;
+}
+
+.card-bottom {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+
+  .status-tag-wrapper,
+  .top-wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .status-tag-wrapper {
+    margin-top: auto;
+  }
 }
