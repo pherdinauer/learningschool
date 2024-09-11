@@ -1,0 +1,70 @@
+.top-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 72px;
+  z-index: 2;
+
+  .barTopLeft {
+    width: 20%;
+  }
+
+  .searchContainer {
+    width: 60%;
+    justify-content: center;
+
+    .searchInputContainer {
+      width: 90%;
+
+      button.ai-button {
+        background: #2a2a2a;
+        box-shadow: 0px 0px 14px 3px #215d85;
+      }
+
+      input {
+        border: 1px solid #ffffff;
+        border-radius: 0.5rem;
+        background-color: transparent;
+      }
+    }
+  }
+
+  .pageTitle,
+  .barTopRight {
+    width: 10%;
+  }
+
+  .darkModeToggle {
+    border: 1px solid white;
+  }
+
+  .avatarContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    .avatar {
+      vertical-align: middle;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+    p {
+      font-size: 10px;
+      text-align: center;
+    }
+  }
+}
+
+.sidebar {
+  height: 100%;
+  position: fixed;
+  z-index: 1;
+  padding-top: 72px;
+}
+
+.mainContent {
+  margin-top: 72px;
+  margin-left: 16rem !important;
+}

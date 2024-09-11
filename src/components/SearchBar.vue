@@ -1,24 +1,40 @@
 <template>
-  <div class="relative w-96">
+  <div class="relative w-96 searchInputContainer">
     <input
       type="text"
       v-model="localSearchQuery"
       @input="updateSearchQuery"
       @keyup.enter="handleSearch"
-      class="w-full py-2 px-4 pr-20 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full py-2 px-4 pr-20 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
       placeholder="Cerca tra i video o chiedi all'IA"
-    >
+    />
     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-      <button @click="handleSearch" class="p-1 focus:outline-none focus:shadow-outline">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+      <button
+        @click="handleSearch"
+        class="p-1 focus:outline-none focus:shadow-outline"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-gray-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd"
+          />
         </svg>
       </button>
-      <button @click="askAI" class="ai-button ml-2 px-2 py-1 rounded-md focus:outline-none focus:shadow-outline" :class="{ 'ai-button-active': isAIActive }">
+      <button
+        @click="askAI"
+        class="ai-button ml-2 px-2 py-1 rounded-md focus:outline-none focus:shadow-outline ai-button"
+        :class="{ 'ai-button-active': isAIActive }"
+      >
         IA
       </button>
     </div>
-    
+
     <!-- AI Response Box -->
     <div v-if="showAIResponse" class="ai-response-box">
       <button @click="closeAIResponse" class="close-button">&times;</button>
@@ -29,38 +45,38 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed } from "vue";
 
 export default defineComponent({
-  name: 'SearchBar',
+  name: "SearchBar",
   props: {
     searchQuery: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
-  emits: ['update:searchQuery', 'search'],
+  emits: ["update:searchQuery", "search"],
   setup(props, { emit }) {
     const localSearchQuery = ref(props.searchQuery);
     const showAIResponse = ref(false);
-    const aiResponse = ref('');
+    const aiResponse = ref("");
     const isTyping = ref(false);
     const isAIActive = ref(false);
 
     const updateSearchQuery = () => {
-      emit('update:searchQuery', localSearchQuery.value);
+      emit("update:searchQuery", localSearchQuery.value);
     };
 
     const handleSearch = () => {
-      emit('search', localSearchQuery.value);
+      emit("search", localSearchQuery.value);
     };
 
     const askAI = () => {
       isAIActive.value = true;
       showAIResponse.value = true;
       isTyping.value = true;
-      aiResponse.value = '';
-      
+      aiResponse.value = "";
+
       const response = `Mi dispiace, purtroppo non è presente un video tutorial a riguardo; tuttavia cercherò di fornirti una risposta esaustiva!
 
 Per modificare i parametri di sistema dell'LCMS, segui questi passaggi:
@@ -92,14 +108,17 @@ Spero che queste istruzioni ti siano d'aiuto. Se hai bisogno di ulteriori chiari
 
     const closeAIResponse = () => {
       showAIResponse.value = false;
-      aiResponse.value = '';
+      aiResponse.value = "";
     };
 
     const formattedAIResponse = computed(() => {
       if (isTyping.value) {
-        return aiResponse.value.replace(/\n/g, '<br>');
+        return aiResponse.value.replace(/\n/g, "<br>");
       } else {
-        return aiResponse.value.replace(/\n/g, '<br>') + '<span class="cursor">|</span>';
+        return (
+          aiResponse.value.replace(/\n/g, "<br>") +
+          '<span class="cursor">|</span>'
+        );
       }
     });
 
@@ -113,9 +132,9 @@ Spero che queste istruzioni ti siano d'aiuto. Se hai bisogno di ulteriori chiari
       isTyping,
       closeAIResponse,
       isAIActive,
-      formattedAIResponse
+      formattedAIResponse,
     };
-  }
+  },
 });
 </script>
 
@@ -134,7 +153,8 @@ Spero che queste istruzioni ti siano d'aiuto. Se hai bisogno di ulteriori chiari
   box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
-.ai-button:active, .ai-button-active {
+.ai-button:active,
+.ai-button-active {
   transform: translateY(1px);
   box-shadow: 0 2px 4px rgba(50, 50, 93, 0.1), 0 1px 2px rgba(0, 0, 0, 0.08);
 }
@@ -200,9 +220,15 @@ Spero che queste istruzioni ti siano d'aiuto. Se hai bisogno di ulteriori chiari
 }
 
 @keyframes blink {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Stili per la modalità dark */
