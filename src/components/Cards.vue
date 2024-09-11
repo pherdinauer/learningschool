@@ -9,15 +9,21 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <div class="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-bl">
-          {{ formatDuration(video.duration) }}
+        <div v-if="isCompleted(video)" class="absolute top-2 right-2 bg-green-500 rounded-full p-1">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
         </div>
       </div>
       <div class="p-2">
         <h3 class="text-sm font-semibold mb-1 text-gray-900 dark:text-white line-clamp-2">{{ video.title }}</h3>
+        <p class="text-xs text-gray-600 dark:text-gray-300 mb-1">{{ formatDuration(video.duration) }}</p>
         <p class="text-xs text-gray-600 dark:text-gray-300 mb-1 line-clamp-2">{{ video.transcript }}</p>
         <div class="flex flex-wrap mb-1">
           <span v-for="tag in video.tags.slice(0, 2)" :key="tag" class="tag mr-1 mb-1 text-xs">{{ tag }}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1 dark:bg-gray-700">
+          <div class="bg-blue-600 h-1.5 rounded-full" :style="{ width: `${getCompletionPercentage(video)}%` }"></div>
         </div>
       </div>
     </div>
@@ -61,12 +67,24 @@ export default defineComponent({
 
     const formatDuration = (seconds: number) => {
       const minutes = Math.floor(seconds / 60);
-      return `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+
+    const isCompleted = (video: Video) => {
+      return video.currentTime && video.duration && (video.currentTime / video.duration) >= 0.9;
+    };
+
+    const getCompletionPercentage = (video: Video) => {
+      if (!video.currentTime || !video.duration) return 0;
+      return Math.min((video.currentTime / video.duration) * 100, 100);
     };
 
     return {
       getFullUrl,
-      formatDuration
+      formatDuration,
+      isCompleted,
+      getCompletionPercentage
     };
   }
 });
