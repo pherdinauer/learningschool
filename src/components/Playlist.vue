@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Playlist</h2>
     <div v-if="isAdminUser">
       <button @click="openCreateModal" class="btn btn-primary mb-4">
         Crea nuova playlist
@@ -40,7 +39,7 @@
           </div>
         </div>
         <div class="flex justify-end">
-          <button @click="closeModal" class="btn btn-secondary mr-2">Annulla</button>
+          <button @click="closeModal" class="btn btn-danger mr-2">Annulla</button>
           <button @click="savePlaylist" class="btn btn-primary">Salva</button>
         </div>
       </div>
