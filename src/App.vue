@@ -4,7 +4,6 @@
     class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300"
   >
     <div class="flex h-screen">
-      <!-- Main content -->
       <div class="flex-1 overflow-y-hidden">
         <!-- Top bar  -->
         <div
@@ -12,7 +11,7 @@
           class="toolbar-gradient shadow-sm top-bar"
         >
           <div class="flex items-center">
-            <div class="flex items-center barTopLeft">
+            <div class="flex items-center barTopLeft px-2">
               <button @click="toggleSidebar" class="btn-menu-transparent">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -29,12 +28,7 @@
                   />
                 </svg>
               </button>
-              <img
-                v-if="!isCollapsed"
-                src="@/assets/logo.png"
-                alt="Logo"
-                class="w-32"
-              />
+              <img src="@/assets/logo.png" alt="Logo" class="w-32" />
             </div>
             <div class="pageTitle">
               <h1 class="text-2xl font-bold text-white">Home</h1>
@@ -100,7 +94,7 @@
           <nav class="space-y-2">
             <router-link
               to="/"
-              class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white"
+              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +110,7 @@
             </router-link>
             <router-link
               to="/favorites"
-              class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white"
+              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +126,7 @@
             </router-link>
             <router-link
               to="/playlists"
-              class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white"
+              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +147,7 @@
             <router-link
               v-if="isAdminUser"
               to="/video-management"
-              class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white"
+              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,52 +163,82 @@
             </router-link>
 
             <!-- Sezione Tag (visibile sempre, con layout diverso in base allo stato del menu) -->
-            <div class="py-3 px-6">
-              <h2
-                class="text-lg font-semibold mb-2 text-white flex items-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span v-if="!isCollapsed">Tag</span>
-              </h2>
+            <div
+              class="flex py-3 px-2 text-lg text-white hover:bg-primary hover:text-white flex-col"
+            >
               <div
-                :class="[
-                  'space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar',
-                  { 'flex flex-col items-center': isCollapsed },
-                ]"
+                :class="`tagTitle ${isTagListCollapsed ? '' : 'listVisible'} ${
+                  isCollapsed ? ' menuCollapsed ' : ''
+                }`"
               >
-                <button
-                  v-for="tag in uniqueTags"
-                  :key="tag"
-                  @click="toggleTagFilter(tag)"
-                  :class="[
-                    'w-full text-left flex justify-between items-center py-2 px-3 rounded transition-colors duration-200 text-white',
-                    { 'bg-blue-600 hover:bg-blue-700': selectedTag === tag },
-                    { 'hover:bg-primary': selectedTag !== tag },
-                    {
-                      'w-10 h-10 flex items-center justify-center': isCollapsed,
-                    },
-                  ]"
-                  :title="tag"
+                <h2
+                  class="text-lg font-semibold mt-2 mb-2 px-2 text-white flex items-center"
                 >
-                  <span v-if="!isCollapsed">{{ tag }}</span>
-                  <span v-else>{{ tag.charAt(0).toUpperCase() }}</span>
-                  <span
-                    v-if="!isCollapsed && selectedTag === tag"
-                    class="text-xs ml-2"
-                    >&times;</span
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 mr-2"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
+                    <path
+                      fill-rule="evenodd"
+                      d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span v-if="!isCollapsed">Tag</span>
+                </h2>
+                <button v-if="!isCollapsed" @click="toggleTagList">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e8eaed"
+                  >
+                    <path
+                      d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"
+                    />
+                  </svg>
                 </button>
+              </div>
+
+              <div
+                :class="`px-4 tagList ${
+                  isTagListCollapsed ? 'hidden' : 'visible'
+                } ${isCollapsed ? ' menuCollapsed ' : ''}`"
+              >
+                <div
+                  v-if="!isCollapsed"
+                  :class="[
+                    'space-y-q max-h-50 overflow-y-auto pr-2 custom-scrollbar',
+                    { 'flex flex-col items-center': isCollapsed },
+                  ]"
+                >
+                  <button
+                    v-for="tag in uniqueTags"
+                    :key="tag"
+                    @click="toggleTagFilter(tag)"
+                    :class="[
+                      'w-full text-left flex justify-between items-center rounded transition-colors duration-200 text-white',
+                      { 'bg-blue-600 hover:bg-blue-700': selectedTag === tag },
+                      { 'hover:bg-primary': selectedTag !== tag },
+                      {
+                        'w-10 h-10 flex items-center justify-center':
+                          isCollapsed,
+                      },
+                    ]"
+                    :title="tag"
+                  >
+                    <span v-if="!isCollapsed">{{ tag }}</span>
+                    <span v-else>{{ tag.charAt(0).toUpperCase() }}</span>
+                    <span
+                      v-if="!isCollapsed && selectedTag === tag"
+                      class="text-xs ml-2"
+                      >&times;</span
+                    >
+                  </button>
+                </div>
               </div>
             </div>
           </nav>
@@ -240,7 +264,7 @@
             </button>
           </div>
         </div>
-
+        <!-- Main content -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mainContent">
           <div v-if="isAdminUser && !isLoginPage" class="mb-4 flex justify-end">
             <button
@@ -310,6 +334,7 @@ export default defineComponent({
     const uniqueTags = ref<string[]>([]);
     const selectedTag = ref<string | null>(null);
     const isCollapsed = ref(false);
+    const isTagListCollapsed = ref(false);
 
     const isLoggedIn = computed(() => {
       return !!userRole.value;
@@ -404,6 +429,10 @@ export default defineComponent({
       isCollapsed.value = !isCollapsed.value;
     };
 
+    const toggleTagList = () => {
+      isTagListCollapsed.value = !isTagListCollapsed.value;
+    };
+
     onMounted(() => {
       window.addEventListener(
         "userRole-changed",
@@ -453,6 +482,8 @@ export default defineComponent({
       toggleTagFilter,
       clearTagFilter,
       isCollapsed,
+      isTagListCollapsed,
+      toggleTagList,
       toggleSidebar,
     };
   },
