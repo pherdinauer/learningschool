@@ -10,7 +10,7 @@
           v-if="isLoggedIn && !isLoginPage"
           class="toolbar-gradient shadow-sm top-bar"
         >
-          <div class="flex items-center">
+          <div class="flex items-center topBarContainer">
             <div class="flex items-center barTopLeft px-2">
               <button @click="toggleSidebar" class="btn-menu-transparent">
                 <svg
@@ -204,14 +204,14 @@
               </div>
 
               <div
-                :class="`px-4 tagList ${
+                :class="`px-3 tagList ${
                   isTagListCollapsed ? 'hidden' : 'visible'
                 } ${isCollapsed ? ' menuCollapsed ' : ''}`"
               >
                 <div
                   v-if="!isCollapsed"
                   :class="[
-                    'space-y-q max-h-50 overflow-y-auto pr-2 custom-scrollbar',
+                    'space-y-q max-h-50 overflow-y-auto custom-scrollbar',
                     { 'flex flex-col items-center': isCollapsed },
                   ]"
                 >
@@ -234,7 +234,7 @@
                     <span v-else>{{ tag.charAt(0).toUpperCase() }}</span>
                     <span
                       v-if="!isCollapsed && selectedTag === tag"
-                      class="text-xs ml-2"
+                      class="ml-2 unselectTag"
                       >&times;</span
                     >
                   </button>

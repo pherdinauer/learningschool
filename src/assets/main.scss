@@ -6,7 +6,7 @@
   z-index: 2;
 
   .barTopLeft {
-    width: 18rem;
+    width: 16rem;
   }
 
   .searchContainer {
@@ -32,6 +32,14 @@
   .pageTitle,
   .barTopRight {
     width: 10%;
+  }
+
+  .barTopRight {
+    margin-left: auto;
+  }
+
+  .pageTitle {
+    padding-left: 2rem;
   }
 
   .darkModeToggle {
@@ -98,6 +106,12 @@
       padding: 3px;
       font-size: 15px;
       margin: 0;
+      padding-left: 5px;
+
+      .unselectTag {
+        font-size: 18px;
+        padding-right: 5px;
+      }
     }
 
     &.visible {
