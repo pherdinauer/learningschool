@@ -9,41 +9,44 @@
             Carica Video
           </h3>
           <div class="mt-4 space-y-4">
-            <div class="flex items-center justify-center w-full">
-              <label for="file-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+            <div 
+              class="flex items-center justify-center w-full"
+              @dragover.prevent
+              @drop.prevent="handleFileDrop"
+            >
+              <label 
+                for="file-upload" 
+                class="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600"
+              >
                 <div v-if="!file" class="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                  <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
-                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Clicca per caricare</span> o trascina e rilascia</p>
+                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Clicca per caricare</span> o trascina qui il file</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">MP4, AVI, MOV (MAX. 800MB)</p>
                 </div>
-                <div v-else class="w-full px-4">
-                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">{{ file.name }}</p>
-                  <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                    <div 
-                      class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
-                      :class="{ 'bg-green-500': uploadProgress === 100 }"
-                      :style="{ width: `${uploadProgress}%` }"
-                    ></div>
-                  </div>
-                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ uploadProgress }}% caricato</p>
+                <div v-else class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg class="w-10 h-10 mb-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <p class="mb-2 text-sm text-gray-700 dark:text-gray-300">File selezionato: <span class="font-semibold">{{ file.name }}</span></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Clicca per cambiare il file</p>
                 </div>
               </label>
               <input id="file-upload" type="file" class="hidden" @change="handleFileChange" accept="video/*" />
             </div>
-            <input v-model="title" placeholder="Titolo del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500">
-            <textarea v-model="transcript" placeholder="Trascrizione del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500" rows="4"></textarea>
+            <input v-model="title" placeholder="Titolo del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+            <textarea v-model="transcript" placeholder="Trascrizione del Video" class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" rows="4"></textarea>
             <div class="flex items-center space-x-2">
               <input
                 v-model="newTag"
                 @keyup.enter="addTag"
                 placeholder="Aggiungi un tag"
-                class="flex-grow p-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+                class="flex-grow p-2 border rounded-md bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 @click="addTag"
-                class="btn-secondary btn-sm"
+                class="btn-primary btn-sm"
               >
                 Aggiungi
               </button>
@@ -67,10 +70,10 @@
           </div>
         </div>
         <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button @click="uploadVideo" type="button" class="btn-primary w-full sm:w-auto sm:ml-3 py-1 px-2 text-sm">
+          <button @click="uploadVideo" type="button" class="btn-primary w-full sm:w-auto sm:ml-3">
             Carica Video
           </button>
-          <button @click="$emit('close')" type="button" class="btn-secondary w-full sm:w-auto mt-3 sm:mt-0">
+          <button @click="$emit('close')" type="button" class="btn-danger w-full sm:w-auto mt-3 sm:mt-0">
             Annulla
           </button>
         </div>
@@ -106,6 +109,13 @@ export default defineComponent({
       if (target.files) {
         file.value = target.files[0];
         uploadProgress.value = 0; // Resetta il progresso quando viene selezionato un nuovo file
+      }
+    };
+
+    const handleFileDrop = (event: DragEvent) => {
+      if (event.dataTransfer?.files) {
+        file.value = event.dataTransfer.files[0];
+        uploadProgress.value = 0;
       }
     };
 
@@ -161,6 +171,7 @@ export default defineComponent({
       newTag,
       uploadProgress,
       handleFileChange,
+      handleFileDrop,
       addTag,
       removeTag,
       uploadVideo
@@ -170,60 +181,41 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.btn {
-  font-weight: bold;
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
+.btn-primary {
+  @apply font-bold bg-blue-600 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
+  @apply bg-blue-700;
 }
 
-.btn-secondary {
-  font-weight: bold;
-  background-color: var(--color-secondary);
-  color: white;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
+.btn-danger {
+  @apply font-bold bg-red-600 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md;
 }
 
-.btn-secondary:hover {
-  background-color: var(--color-secondary-dark);
-}
-
-.btn-tertiary {
-  font-weight: bold;
-  background-color: var(--color-tertiary);
-  color: white;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
-}
-
-.btn-tertiary:hover {
-  background-color: var(--color-tertiary-dark);
+.btn-danger:hover {
+  @apply bg-red-700;
 }
 
 .btn-sm {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
+  @apply text-sm py-1 px-2;
 }
 
 .tag {
-  background-color: var(--color-tertiary);
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  transition-property: color, background-color, border-color;
-  transition-duration: 300ms;
+  @apply bg-blue-500 text-white text-xs py-1 px-2 rounded mr-2 mb-2 shadow-sm;
+}
+
+:root {
+  --color-primary: #3490dc;
+  --color-primary-dark: #2779bd;
+  --color-danger: #e3342f;
+  --color-danger-dark: #cc1f1a;
+}
+
+.dark {
+  --color-primary: #4299e1;
+  --color-primary-dark: #3182ce;
+  --color-danger: #f56565;
+  --color-danger-dark: #e53e3e;
 }
 </style>
