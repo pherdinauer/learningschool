@@ -8,16 +8,16 @@
       <p class="text-gray-600 dark:text-gray-400">Nessun video trovato.</p>
     </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="video in videos" :key="video.id" class="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden">
+      <div v-for="video in videos" :key="video.id" class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
         <img :src="getFullUrl(video.thumbnailUrl)" :alt="video.title" class="w-full h-48 object-cover cursor-pointer" @click="playVideo(video)">
         <div class="p-4">
           <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{{ video.title }}</h2>
           <p class="text-gray-600 dark:text-gray-300 mb-4">Durata: {{ formatDuration(video.duration) }}</p>
           <div class="flex space-x-2">
-            <button @click="editVideo(video)" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            <button @click="editVideo(video)" class="font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md">
               Modifica
             </button>
-            <button @click="deleteVideo(video.id)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+            <button @click="deleteVideo(video.id)" class="font-bold bg-red-600 hover:bg-red-700 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md">
               Elimina
             </button>
           </div>
@@ -27,24 +27,24 @@
 
     <!-- Modal per la modifica del video -->
     <div v-if="editingVideo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-lg w-full">
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg max-w-lg w-full">
         <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Modifica Video</h2>
-        <input v-model="editingVideo.title" class="w-full mb-4 p-2 border rounded dark:bg-gray-700 dark:text-white" placeholder="Titolo">
-        <textarea v-model="editingVideo.transcript" class="w-full mb-4 p-2 border rounded dark:bg-gray-700 dark:text-white" placeholder="Trascrizione" rows="4"></textarea>
+        <input v-model="editingVideo.title" class="w-full mb-4 p-2 border rounded dark:bg-gray-800 dark:text-white" placeholder="Titolo">
+        <textarea v-model="editingVideo.transcript" class="w-full mb-4 p-2 border rounded dark:bg-gray-800 dark:text-white" placeholder="Trascrizione" rows="4"></textarea>
         <div class="mb-4">
-          <input v-model="newTag" @keyup.enter="addTag" class="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" placeholder="Aggiungi tag">
+          <input v-model="newTag" @keyup.enter="addTag" class="w-full p-2 border rounded dark:bg-gray-800 dark:text-white" placeholder="Aggiungi tag">
         </div>
         <div class="flex flex-wrap mb-4">
-          <span v-for="(tag, index) in editingVideo.tags" :key="index" class="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2 mb-2">
+          <span v-for="(tag, index) in editingVideo.tags" :key="index" class="bg-blue-500 text-white text-xs py-1 px-2 rounded mr-2 mb-2 shadow-sm">
             {{ tag }}
-            <button @click="removeTag(index)" class="ml-1 text-red-500">&times;</button>
+            <button @click="removeTag(index)" class="ml-1 text-xs font-bold hover:text-red-500 transition-colors duration-300">&times;</button>
           </span>
         </div>
         <div class="flex justify-end">
-          <button @click="cancelEdit" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2">
+          <button @click="cancelEdit" class="font-bold bg-red-600 hover:bg-red-700 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md mr-2">
             Annulla
           </button>
-          <button @click="saveEdit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+          <button @click="saveEdit" class="font-bold bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors duration-300 py-2 px-4 shadow-md">
             Salva
           </button>
         </div>
@@ -239,3 +239,7 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+/* Nessuno stile necessario qui, tutto è gestito dalle classi Tailwind */
+</style>
