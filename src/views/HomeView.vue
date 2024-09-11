@@ -1,6 +1,17 @@
 <template>
   <div class="flex custom-scrollbar">
     <div class="w-full overflow-y-auto h-screen pb-20">
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Playlist</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+        <div v-for="playlist in playlists" :key="playlist.id" class="custom-card rounded-lg shadow-md overflow-hidden relative bg-white dark:bg-gray-800 cursor-pointer" @click="openPlaylistModal(playlist)">
+          <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2 line-clamp-2">{{ playlist.name }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ playlist.videos.length }} video</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Video</h2>
       <Cards 
         :videos="filteredVideos" 
         :baseUrl="baseUrl"
@@ -20,6 +31,16 @@
       @close="closeVideoModal"
       @timeUpdate="updateVideoTime"
     />
+
+    <!-- Playlist Modal -->
+    <PlaylistModal
+      v-if="selectedPlaylist"
+      :playlist="selectedPlaylist"
+      :videos="playlistVideos"
+      :baseUrl="baseUrl"
+      @close="closePlaylistModal"
+      @open-video-modal="openVideoModal"
+    />
   </div>
 </template>
 
@@ -27,6 +48,8 @@
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
 import VideoPlayer from './VideoPlayer.vue';
 import Cards from '@/components/Cards.vue';
+import PlaylistModal from '@/components/PlaylistModal.vue';
+import axios from 'axios';
 
 interface Video {
   id: string;
@@ -39,11 +62,18 @@ interface Video {
   currentTime?: number;
 }
 
+interface Playlist {
+  id: string;
+  name: string;
+  videos: string[];
+}
+
 export default defineComponent({
   name: 'HomeView',
   components: {
     VideoPlayer,
-    Cards
+    Cards,
+    PlaylistModal,
   },
   props: {
     searchQuery: {
@@ -60,6 +90,9 @@ export default defineComponent({
     const selectedVideo = ref<Video | null>(null);
     const favorites = ref<string[]>(JSON.parse(localStorage.getItem('favorites') || '[]'));
     const baseUrl = 'http://localhost:3000';
+    const playlists = ref<Playlist[]>([]);
+    const selectedPlaylist = ref<Playlist | null>(null);
+    const playlistVideos = ref<Video[]>([]);
 
     const fetchVideos = async () => {
       try {
@@ -71,6 +104,15 @@ export default defineComponent({
         videos.value = data;
       } catch (error) {
         console.error('Error fetching videos:', error);
+      }
+    };
+
+    const fetchPlaylists = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/playlists`);
+        playlists.value = response.data;
+      } catch (error) {
+        console.error('Error fetching playlists:', error);
       }
     };
 
@@ -120,7 +162,29 @@ export default defineComponent({
       return `${baseUrl}${url}`;
     };
 
-    onMounted(fetchVideos);
+    const openPlaylistModal = async (playlist: Playlist) => {
+      selectedPlaylist.value = playlist;
+      try {
+        const videoPromises = playlist.videos.map(videoId => 
+          axios.get(`${baseUrl}/videos/${videoId}`)
+        );
+        const videoResponses = await Promise.all(videoPromises);
+        playlistVideos.value = videoResponses.map(response => response.data);
+      } catch (error) {
+        console.error('Errore nel recupero dei video della playlist:', error);
+        alert('Si è verificato un errore nel caricamento dei video della playlist');
+      }
+    };
+
+    const closePlaylistModal = () => {
+      selectedPlaylist.value = null;
+      playlistVideos.value = [];
+    };
+
+    onMounted(() => {
+      fetchVideos();
+      fetchPlaylists();
+    });
 
     watch(() => props.searchQuery, fetchVideos);
 
@@ -134,6 +198,11 @@ export default defineComponent({
       updateVideoTime,
       baseUrl,
       favorites,
+      playlists,
+      selectedPlaylist,
+      playlistVideos,
+      openPlaylistModal,
+      closePlaylistModal,
     };
   }
 });

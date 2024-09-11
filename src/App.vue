@@ -29,6 +29,12 @@
             </svg>
             <span v-if="!isCollapsed" class="ml-3">Favorites</span>
           </router-link>
+          <router-link to="/playlists" class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span v-if="!isCollapsed" class="ml-3">Playlist</span>
+          </router-link>
           <router-link v-if="isAdminUser" to="/video-management" class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
               <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />

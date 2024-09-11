@@ -5,6 +5,7 @@ const cors = require('cors');
 const fs = require('fs').promises;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+const moment = require('moment');
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
@@ -14,6 +15,46 @@ app.use(express.json());
 
 // Array per memorizzare i dati dei video
 let videos = [];
+
+// Array per memorizzare i dati delle playlist
+let playlists = [];
+
+// Strutture dati per memorizzare le analytics
+let videoAnalytics = {};
+let userAnalytics = {};
+
+// Funzione per salvare i dati di analytics
+const saveAnalyticsData = async () => {
+  try {
+    await fs.writeFile('data/videoAnalytics.json', JSON.stringify(videoAnalytics));
+    await fs.writeFile('data/userAnalytics.json', JSON.stringify(userAnalytics));
+    console.log('Analytics data saved successfully');
+  } catch (error) {
+    console.error('Error saving analytics data:', error);
+  }
+};
+
+// Funzione per caricare i dati di analytics
+const loadAnalyticsData = async () => {
+  try {
+    const videoAnalyticsData = await fs.readFile('data/videoAnalytics.json', 'utf8');
+    const userAnalyticsData = await fs.readFile('data/userAnalytics.json', 'utf8');
+    videoAnalytics = JSON.parse(videoAnalyticsData);
+    userAnalytics = JSON.parse(userAnalyticsData);
+    console.log('Analytics data loaded successfully');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('No existing analytics data found. Starting with empty data.');
+      videoAnalytics = {};
+      userAnalytics = {};
+      await saveAnalyticsData();
+    } else {
+      console.error('Error loading analytics data:', error);
+      videoAnalytics = {};
+      userAnalytics = {};
+    }
+  }
+};
 
 // Funzione per generare ID unici
 const generateId = () => Date.now().toString() + Math.random().toString().slice(2);
@@ -80,6 +121,16 @@ const saveData = async () => {
   }
 };
 
+// Funzione per salvare i dati delle playlist
+const savePlaylistsData = async () => {
+  try {
+    await fs.writeFile('data/playlists.json', JSON.stringify(playlists));
+    console.log('Playlists data saved successfully');
+  } catch (error) {
+    console.error('Error saving playlists data:', error);
+  }
+};
+
 // Funzione per caricare i dati da file JSON
 const loadData = async () => {
   try {
@@ -100,11 +151,81 @@ const loadData = async () => {
   }
 };
 
+// Funzione per caricare i dati delle playlist
+const loadPlaylistsData = async () => {
+  try {
+    const playlistsData = await fs.readFile('data/playlists.json', 'utf8');
+    playlists = JSON.parse(playlistsData);
+    console.log('Playlists data loaded successfully');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('No existing playlists data found. Starting with empty data.');
+      playlists = [];
+      await savePlaylistsData();
+    } else {
+      console.error('Error loading playlists data:', error);
+      playlists = [];
+    }
+  }
+};
+
 // Endpoint per ottenere tutti i video
 app.get('/videos', (req, res) => {
   console.log('Richiesta ricevuta per /videos');
   console.log(`Invio di ${videos.length} video`);
   res.json(videos);
+});
+
+// Endpoint per ottenere tutte le playlist
+app.get('/playlists', (req, res) => {
+  res.json(playlists);
+});
+
+// Endpoint per creare una nuova playlist
+app.post('/playlists', async (req, res) => {
+  const { name, videos } = req.body;
+  const newPlaylist = {
+    id: generateId(),
+    name,
+    videos
+  };
+  playlists.push(newPlaylist);
+  await savePlaylistsData();
+  res.status(201).json(newPlaylist);
+});
+
+// Endpoint per aggiornare una playlist
+app.put('/playlists/:id', async (req, res) => {
+  const { name, videos } = req.body;
+  const playlistId = req.params.id;
+  const playlistIndex = playlists.findIndex(p => p.id === playlistId);
+
+  if (playlistIndex === -1) {
+    return res.status(404).json({ error: 'Playlist not found' });
+  }
+
+  playlists[playlistIndex] = {
+    ...playlists[playlistIndex],
+    name: name || playlists[playlistIndex].name,
+    videos: videos || playlists[playlistIndex].videos
+  };
+
+  await savePlaylistsData();
+  res.json(playlists[playlistIndex]);
+});
+
+// Endpoint per eliminare una playlist
+app.delete('/playlists/:id', async (req, res) => {
+  const playlistId = req.params.id;
+  const playlistIndex = playlists.findIndex(p => p.id === playlistId);
+
+  if (playlistIndex === -1) {
+    return res.status(404).json({ error: 'Playlist not found' });
+  }
+
+  playlists.splice(playlistIndex, 1);
+  await savePlaylistsData();
+  res.json({ message: 'Playlist deleted successfully' });
 });
 
 // Endpoint per il caricamento dei video
@@ -235,6 +356,7 @@ app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   await createUploadDirectories();
   await loadData();
+  await loadPlaylistsData();
 });
 
 // Endpoint forzato per le anteprime
