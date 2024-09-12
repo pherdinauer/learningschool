@@ -1,5 +1,24 @@
 <template>
-  <div class="flex custom-scrollbar">
+  <div class="flex flex-col custom-scrollbar">
+    <!-- Tag filter bar -->
+    <div class="tag-filter-bar py-4 px-4 overflow-x-auto">
+      <div class="flex space-x-2">
+        <button
+          v-for="tag in uniqueTags"
+          :key="tag"
+          @click="toggleTagFilter(tag)"
+          :class="[
+            'px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200',
+            selectedTag === tag
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+          ]"
+        >
+          {{ tag }}
+        </button>
+      </div>
+    </div>
+
     <div class="w-full overflow-y-auto h-screen pb-20">
       <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Playlist</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
@@ -15,9 +34,8 @@
       <Cards 
         :videos="filteredVideos" 
         :baseUrl="baseUrl"
-        :favorites="favorites"
-        @toggle-favorite="toggleFavorite"
         @open-video-modal="openVideoModal"
+        @favorites-updated="updateFavorites"
       />
     </div>
 
@@ -118,7 +136,7 @@ export default defineComponent({
 
     const filteredVideos = computed(() => {
       return videos.value.filter(video =>
-        (props.selectedTag ? video.tags.includes(props.selectedTag) : true) &&
+        (!selectedTag.value || video.tags.includes(selectedTag.value)) &&
         (video.transcript.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
          video.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
          video.tags.some(tag => tag.toLowerCase().includes(props.searchQuery.toLowerCase()))
@@ -181,6 +199,21 @@ export default defineComponent({
       playlistVideos.value = [];
     };
 
+    const updateFavorites = (newFavorites: string[]) => {
+      favorites.value = newFavorites;
+    };
+
+    const uniqueTags = computed(() => {
+      const allTags = videos.value.flatMap(video => video.tags);
+      return ['Tutti', ...new Set(allTags)];
+    });
+
+    const selectedTag = ref<string | null>(null);
+
+    const toggleTagFilter = (tag: string) => {
+      selectedTag.value = selectedTag.value === tag ? null : tag;
+    };
+
     onMounted(() => {
       fetchVideos();
       fetchPlaylists();
@@ -203,6 +236,10 @@ export default defineComponent({
       playlistVideos,
       openPlaylistModal,
       closePlaylistModal,
+      updateFavorites,
+      uniqueTags,
+      selectedTag,
+      toggleTagFilter,
     };
   }
 });
@@ -234,5 +271,29 @@ export default defineComponent({
 
 :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(75, 85, 99, 0.5);
+}
+
+.tag-filter-bar {
+  position: sticky;
+  top: 64px; /* Regola questo valore in base all'altezza della tua toolbar */
+  z-index: 10;
+  border-bottom: 1px solid #e5e7eb; /* Aggiunge una sottile linea di separazione */
+}
+
+.dark .tag-filter-bar {
+  border-bottom-color: #4b5563; /* Colore della linea per la modalità scura */
+}
+
+.tag-filter-bar .flex {
+  padding-bottom: 0.5rem; /* Aggiunge un po' di spazio sotto i bottoni */
+}
+
+.tag-filter-bar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tag-filter-bar::-webkit-scrollbar {
+  display: none;
 }
 </style>
