@@ -39,5 +39,10 @@ h2.sectionTitle {
     margin-right: 10px;
     padding: 0 12px;
     height: 30px;
+
+    &.selectedTag {
+      background-color: black;
+      color: white;
+    }
   }
 }

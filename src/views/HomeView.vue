@@ -7,7 +7,12 @@
           v-for="tag in uniqueTags"
           :key="tag"
           @click="toggleTagFilter(tag)"
-          :class="['tagButton', selectedTag === tag ? 'selectedTag' : '']"
+          :class="[
+            'tagButton',
+            selectedTag === tag || (selectedTag == null && tag == 'Tutti')
+              ? 'selectedTag'
+              : '',
+          ]"
         >
           {{ tag }}
         </button>
@@ -274,7 +279,11 @@ export default defineComponent({
     const selectedTag = ref<string | null>(null);
 
     const toggleTagFilter = (tag: string) => {
-      selectedTag.value = selectedTag.value === tag ? null : tag;
+      if (tag === "Tutti" || selectedTag.value === tag) {
+        selectedTag.value = null;
+      } else {
+        selectedTag.value = tag;
+      }
     };
 
     const handleNewVideo = () => {
