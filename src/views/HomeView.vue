@@ -15,9 +15,7 @@
     </div>
 
     <div class="w-full overflow-y-auto h-screen pb-20">
-      <h2
-        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white sectionTitle"
-      >
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
         Playlist
       </h2>
       <div
@@ -69,12 +67,17 @@
       >
         Video
       </h2>
-      <Cards
-        :videos="filteredVideos"
-        :baseUrl="baseUrl"
-        @open-video-modal="openVideoModal"
-        @favorites-updated="updateFavorites"
-      />
+      <div v-if="filteredVideos.length > 0">
+        <Cards
+          :videos="filteredVideos"
+          :baseUrl="baseUrl"
+          @open-video-modal="openVideoModal"
+          @favorites-updated="updateFavorites"
+        />
+      </div>
+      <div v-else class="text-center py-10">
+        <p class="text-xl text-gray-600 dark:text-gray-400">Non ci sono risultati</p>
+      </div>
     </div>
 
     <!-- Video Modal -->
@@ -101,12 +104,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, watch } from "vue";
+import { defineComponent, ref, computed, onMounted, watch, onUnmounted } from "vue";
 import VideoPlayer from "./VideoPlayer.vue";
 import Cards from "@/components/Cards.vue";
 import PlaylistModal from "@/components/PlaylistModal.vue";
 import axios from "axios";
 import "../assets/home.scss";
+import eventBus from "@/eventBus";
 
 interface Video {
   id: string;
@@ -153,17 +157,14 @@ export default defineComponent({
     const playlists = ref<Playlist[]>([]);
     const selectedPlaylist = ref<Playlist | null>(null);
     const playlistVideos = ref<Video[]>([]);
+    const refreshKey = ref(0);
 
     const fetchVideos = async () => {
       try {
-        const response = await fetch(`${baseUrl}/videos`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data: Video[] = await response.json();
-        videos.value = data;
+        const response = await axios.get(`${baseUrl}/videos`);
+        videos.value = response.data;
       } catch (error) {
-        console.error("Error fetching videos:", error);
+        console.error("Errore nel recupero dei video:", error);
       }
     };
 
@@ -213,7 +214,6 @@ export default defineComponent({
     const updateVideoTime = (time: number) => {
       if (selectedVideo.value) {
         selectedVideo.value.currentTime = time;
-        // Aggiorna anche il video nell'array videos
         const index = videos.value.findIndex(
           (v) => v.id === selectedVideo.value!.id
         );
@@ -266,12 +266,26 @@ export default defineComponent({
       selectedTag.value = selectedTag.value === tag ? null : tag;
     };
 
+    const handleNewVideo = () => {
+      console.log("Nuovo video rilevato, aggiornamento in corso...");
+      setTimeout(() => {
+        fetchVideos();
+      }, 2000); // Ritardo di 2 secondi
+    };
+
     onMounted(() => {
       fetchVideos();
       fetchPlaylists();
+      eventBus.$on("video-uploaded", handleNewVideo);
     });
 
-    watch(() => props.searchQuery, fetchVideos);
+    onUnmounted(() => {
+      eventBus.$off("video-uploaded", handleNewVideo);
+    });
+
+    watch(videos, () => {
+      refreshKey.value++;
+    });
 
     return {
       filteredVideos,
@@ -292,6 +306,7 @@ export default defineComponent({
       uniqueTags,
       selectedTag,
       toggleTagFilter,
+      refreshKey,
     };
   },
 });
@@ -327,17 +342,17 @@ export default defineComponent({
 
 .tag-filter-bar {
   position: sticky;
-  top: 64px; /* Regola questo valore in base all'altezza della tua toolbar */
+  top: 64px;
   z-index: 10;
-  border-bottom: 1px solid #e5e7eb; /* Aggiunge una sottile linea di separazione */
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .dark .tag-filter-bar {
-  border-bottom-color: #4b5563; /* Colore della linea per la modalità scura */
+  border-bottom-color: #4b5563;
 }
 
 .tag-filter-bar .flex {
-  padding-bottom: 0.5rem; /* Aggiunge un po' di spazio sotto i bottoni */
+  padding-bottom: 0.5rem;
 }
 
 .tag-filter-bar {
