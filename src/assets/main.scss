@@ -3,7 +3,7 @@
   top: 0;
   width: 100%;
   height: 72px;
-  z-index: 2;
+  z-index: 11;
 
   .barTopLeft {
     width: 16rem;
@@ -74,7 +74,7 @@
       box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
       border-radius: 0.5rem;
       background-color: white;
-      width: 10rem;
+      width: 8rem;
       top: 90%;
       right: 0;
       transform: translateY(10px);
@@ -83,15 +83,9 @@
       align-items: self-start;
       justify-content: center;
 
-      hr {
-        width: 90%;
-        margin: auto;
-        border-color: #555353;
-      }
-
       p {
         width: 100%;
-        font-size: 1rem;
+        font-size: 0.8rem;
         margin-top: 6px;
         margin-bottom: 6px;
       }
@@ -102,7 +96,7 @@
         text-align: left;
         span {
           margin-left: 10px;
-          font-size: 1rem;
+          font-size: 0.8rem;
         }
         &:hover {
           background-color: #f0f0f0;

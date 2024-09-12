@@ -64,7 +64,6 @@
                     Welcome, <br />{{ isAdminUser ? "Admin" : "User" }}
                     {{ "Valerio" }}
                   </p>
-                  <hr />
                   <!-- Dark mode toggle button -->
                   <button
                     @click="toggleDarkMode"

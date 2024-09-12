@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col custom-scrollbar">
     <!-- Tag filter bar -->
-    <div class="tag-filter-bar py-4 px-4 overflow-x-auto">
+    <div class="tag-filter-bar overflow-x-auto">
       <div class="flex tagContainer">
         <button
           v-for="tag in uniqueTags"
@@ -15,7 +15,9 @@
     </div>
 
     <div class="w-full overflow-y-auto h-screen pb-20">
-      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+      <h2
+        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white sectionTitle"
+      >
         Playlist
       </h2>
       <div
@@ -76,7 +78,9 @@
         />
       </div>
       <div v-else class="text-center py-10">
-        <p class="text-xl text-gray-600 dark:text-gray-400">Non ci sono risultati</p>
+        <p class="text-xl text-gray-600 dark:text-gray-400">
+          Non ci sono risultati
+        </p>
       </div>
     </div>
 
@@ -104,7 +108,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, watch, onUnmounted } from "vue";
+import {
+  defineComponent,
+  ref,
+  computed,
+  onMounted,
+  watch,
+  onUnmounted,
+} from "vue";
 import VideoPlayer from "./VideoPlayer.vue";
 import Cards from "@/components/Cards.vue";
 import PlaylistModal from "@/components/PlaylistModal.vue";
