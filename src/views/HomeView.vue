@@ -28,45 +28,10 @@
       <div
         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
       >
-        <div
-          v-for="playlist in playlists"
-          :key="playlist.id"
-          class="custom-card rounded-lg shadow-md overflow-hidden relative bg-white dark:bg-gray-800 cursor-pointer playlistCard"
-          @click="openPlaylistModal(playlist)"
-        >
-          <div class="playlistIcon">
-            <svg
-              id="fi_4043797"
-              height="512"
-              viewBox="0 0 512 512"
-              width="512"
-              xmlns="http://www.w3.org/2000/svg"
-              data-name="Layer 1"
-              :fill="
-                'rgb(' +
-                playlist.color[0] +
-                ',' +
-                playlist.color[1] +
-                ',' +
-                playlist.color[2] +
-                ')'
-              "
-            >
-              <path
-                d="m280.593 449.83a16 16 0 0 1 -16 16h-248.593a16 16 0 0 1 0-32h248.593a16 16 0 0 1 16 16zm-16-151.538h-248.593a16 16 0 0 0 0 32h248.593a16 16 0 0 0 0-32zm-248.593-239.076h480a16 16 0 0 0 0-32h-480a16 16 0 0 0 0 32zm496 322.845a16 16 0 0 1 -7.773 13.723l-144.673 86.724a16 16 0 0 1 -24.226-13.724v-173.447a16 16 0 0 1 24.226-13.724l144.672 86.724a16 16 0 0 1 7.774 13.724zm-47.12 0-97.552-58.478v116.956zm31.12-219.307h-480a16 16 0 0 0 0 32h480a16 16 0 0 0 0-32z"
-              ></path>
-            </svg>
-          </div>
-
-          <div class="playlistDescriptionWrapper">
-            <h3 class="text-lg font-semibold mb-2 line-clamp-2">
-              {{ playlist.name }}
-            </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-300">
-              {{ playlist.videos.length }} video
-            </p>
-          </div>
-        </div>
+        <PlaylistCards
+          :playlists="playlists"
+          @open-playlist-modal="openPlaylistModal"
+        />
       </div>
 
       <h2
@@ -123,6 +88,7 @@ import {
 } from "vue";
 import VideoPlayer from "./VideoPlayer.vue";
 import Cards from "@/components/Cards.vue";
+import PlaylistCards from "@/components/PlaylistCards.vue";
 import PlaylistModal from "@/components/PlaylistModal.vue";
 import axios from "axios";
 import "../assets/home.scss";
@@ -142,7 +108,7 @@ interface Video {
 interface Playlist {
   id: string;
   name: string;
-  color: string;
+  color: number[];
   videos: string[];
 }
 
@@ -152,6 +118,7 @@ export default defineComponent({
     VideoPlayer,
     Cards,
     PlaylistModal,
+    PlaylistCards,
   },
   props: {
     searchQuery: {
@@ -169,11 +136,12 @@ export default defineComponent({
     const favorites = ref<string[]>(
       JSON.parse(localStorage.getItem("favorites") || "[]")
     );
-    const baseUrl = "http://localhost:3000";
-    const playlists = ref<Playlist[]>([]);
     const selectedPlaylist = ref<Playlist | null>(null);
+
+    const baseUrl = "http://localhost:3000";
     const playlistVideos = ref<Video[]>([]);
     const refreshKey = ref(0);
+    const playlists = ref<Playlist[]>([]);
 
     const fetchVideos = async () => {
       try {
@@ -191,6 +159,27 @@ export default defineComponent({
       } catch (error) {
         console.error("Error fetching playlists:", error);
       }
+    };
+
+    const openPlaylistModal = async (playlist: Playlist) => {
+      selectedPlaylist.value = playlist;
+      try {
+        const videoPromises = playlist.videos.map((videoId) =>
+          axios.get(`${baseUrl}/videos/${videoId}`)
+        );
+        const videoResponses = await Promise.all(videoPromises);
+        playlistVideos.value = videoResponses.map((response) => response.data);
+      } catch (error) {
+        console.error("Errore nel recupero dei video della playlist:", error);
+        alert(
+          "Si è verificato un errore nel caricamento dei video della playlist"
+        );
+      }
+    };
+
+    const closePlaylistModal = () => {
+      selectedPlaylist.value = null;
+      playlistVideos.value = [];
     };
 
     const filteredVideos = computed(() => {
@@ -246,27 +235,6 @@ export default defineComponent({
       return `${baseUrl}${url}`;
     };
 
-    const openPlaylistModal = async (playlist: Playlist) => {
-      selectedPlaylist.value = playlist;
-      try {
-        const videoPromises = playlist.videos.map((videoId) =>
-          axios.get(`${baseUrl}/videos/${videoId}`)
-        );
-        const videoResponses = await Promise.all(videoPromises);
-        playlistVideos.value = videoResponses.map((response) => response.data);
-      } catch (error) {
-        console.error("Errore nel recupero dei video della playlist:", error);
-        alert(
-          "Si è verificato un errore nel caricamento dei video della playlist"
-        );
-      }
-    };
-
-    const closePlaylistModal = () => {
-      selectedPlaylist.value = null;
-      playlistVideos.value = [];
-    };
-
     const updateFavorites = (newFavorites: string[]) => {
       favorites.value = newFavorites;
     };
@@ -318,11 +286,11 @@ export default defineComponent({
       baseUrl,
       favorites,
       playlists,
-      selectedPlaylist,
       playlistVideos,
+      updateFavorites,
       openPlaylistModal,
       closePlaylistModal,
-      updateFavorites,
+      selectedPlaylist,
       uniqueTags,
       selectedTag,
       toggleTagFilter,

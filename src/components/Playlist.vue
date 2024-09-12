@@ -11,32 +11,10 @@
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
-        v-for="playlist in playlists"
-        :key="playlist.id"
-        class="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4"
-      >
-        <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-          {{ playlist.name }}
-        </h3>
-        <p class="text-gray-600 dark:text-gray-300 mb-2">
-          {{ playlist.videos.length }} video
-        </p>
-        <button @click="viewPlaylist(playlist)" class="btn btn-secondary mr-2">
-          Visualizza
-        </button>
-        <template v-if="isAdminUser">
-          <button
-            @click="editPlaylist(playlist)"
-            class="btn btn-secondary mr-2"
-          >
-            Modifica
-          </button>
-          <button @click="deletePlaylist(playlist.id)" class="btn btn-danger">
-            Elimina
-          </button>
-        </template>
-      </div>
+      <PlaylistCards
+        :playlists="playlists"
+        @open-playlist-modal="openPlaylistModal"
+      />
     </div>
 
     <!-- Modal per creare/modificare playlist -->
@@ -86,35 +64,22 @@
     </div>
 
     <!-- Modal per visualizzare i video della playlist -->
-    <div
-      v-if="showPlaylistModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div
-        class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-          {{ selectedPlaylist?.name }}
-        </h2>
-        <Cards
-          :videos="playlistVideos"
-          :baseUrl="baseUrl"
-          @open-video-modal="openVideoModal"
-        />
-        <div class="flex justify-end mt-4">
-          <button @click="closePlaylistModal" class="btn btn-secondary">
-            Chiudi
-          </button>
-        </div>
-      </div>
-    </div>
+    <PlaylistModal
+      v-if="selectedPlaylist"
+      :playlist="selectedPlaylist"
+      :videos="playlistVideos"
+      :baseUrl="baseUrl"
+      @close="closePlaylistModal"
+      @open-video-modal="openVideoModal"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";
-import Cards from "@/components/Cards.vue";
+import PlaylistCards from "@/components/PlaylistCards.vue";
+import PlaylistModal from "@/components/PlaylistModal.vue";
 
 interface Video {
   id: string;
@@ -137,7 +102,8 @@ interface Playlist {
 export default defineComponent({
   name: "Playlist",
   components: {
-    Cards,
+    PlaylistCards,
+    PlaylistModal,
   },
   setup() {
     const playlists = ref<Playlist[]>([]);
@@ -170,6 +136,22 @@ export default defineComponent({
         availableVideos.value = response.data;
       } catch (error) {
         console.error("Errore nel recupero dei video:", error);
+      }
+    };
+
+    const openPlaylistModal = async (playlist: Playlist) => {
+      selectedPlaylist.value = playlist;
+      try {
+        const videoPromises = playlist.videos.map((videoId) =>
+          axios.get(`${baseUrl}/videos/${videoId}`)
+        );
+        const videoResponses = await Promise.all(videoPromises);
+        playlistVideos.value = videoResponses.map((response) => response.data);
+      } catch (error) {
+        console.error("Errore nel recupero dei video della playlist:", error);
+        alert(
+          "Si è verificato un errore nel caricamento dei video della playlist"
+        );
       }
     };
 
@@ -345,6 +327,7 @@ export default defineComponent({
       closeModal,
       savePlaylist,
       deletePlaylist,
+      openPlaylistModal,
       showPlaylistModal,
       selectedPlaylist,
       playlistVideos,
