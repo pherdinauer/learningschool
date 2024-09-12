@@ -249,6 +249,31 @@
               <span v-if="!isCollapsed" class="ml-3">Manage Videos</span>
             </router-link>
           </nav>
+          <div class="accessibilityButtonContainer">
+            <!-- Compliance ADA options -->
+            <button
+              class="accessibilityButton"
+              @click="toggleAccessibilityModal"
+            >
+              <svg
+                id="Capa_1"
+                enable-background="new 0 0 512 512"
+                height="512"
+                viewBox="0 0 512 512"
+                width="512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g>
+                  <path
+                    d="m437.02 74.98c-48.353-48.351-112.64-74.98-181.02-74.98s-132.667 26.629-181.02 74.98c-48.351 48.353-74.98 112.64-74.98 181.02s26.629 132.667 74.98 181.02c48.353 48.351 112.64 74.98 181.02 74.98s132.667-26.629 181.02-74.98c48.351-48.353 74.98-112.64 74.98-181.02s-26.629-132.667-74.98-181.02zm-21.214 340.826c-42.686 42.686-99.439 66.194-159.806 66.194s-117.12-23.508-159.806-66.194-66.194-99.439-66.194-159.806 23.508-117.12 66.194-159.806 99.439-66.194 159.806-66.194 117.12 23.508 159.806 66.194 66.194 99.439 66.194 159.806-23.508 117.12-66.194 159.806z"
+                  />
+                  <path
+                    d="m319.039 123.038c0-34.76-28.279-63.038-63.039-63.038s-63.039 28.278-63.039 63.038c0 12.108 3.439 23.425 9.38 33.039h-96.341v90h83.039v40.98l-65.49 113.433 77.942 45 54.509-94.413 54.51 94.413 77.942-45-65.49-113.433v-40.98h83.038v-90h-96.342c5.942-9.614 9.381-20.931 9.381-33.039zm-96.078 0c0-18.217 14.821-33.038 33.039-33.038s33.039 14.821 33.039 33.038c0 18.218-14.821 33.039-33.039 33.039s-33.039-14.821-33.039-33.039zm153.039 93.039h-83.039v79.02l54.51 94.413-25.981 15-65.49-113.433-65.49 113.433-25.981-15 54.51-94.413v-79.02h-83.039v-30h240z"
+                  />
+                </g>
+              </svg>
+            </button>
+          </div>
         </div>
         <!-- Main content -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mainContent">
@@ -266,6 +291,12 @@
         @close="showUploadModal = false"
         @videoUploaded="handleVideoUploaded"
       />
+
+      <!-- Accessibility Modal -->
+      <AccessibilityModal
+        v-if="showAccessibilityModal"
+        @close="showAccessibilityModal = false"
+      />
     </div>
   </div>
 </template>
@@ -274,6 +305,7 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import UploadModal from "@/components/UploadModal.vue";
+import AccessibilityModal from "@/components/AccessibilityModal.vue";
 import eventBus from "@/eventBus";
 import axios from "axios";
 import SearchBar from "@/components/SearchBar.vue";
@@ -284,6 +316,7 @@ export default defineComponent({
   name: "App",
   components: {
     UploadModal,
+    AccessibilityModal,
     SearchBar,
   },
   setup() {
@@ -291,6 +324,7 @@ export default defineComponent({
     const route = useRoute();
     const searchQuery = ref("");
     const showUploadModal = ref(false);
+    const showAccessibilityModal = ref(false);
     const isDarkMode = ref(
       localStorage.getItem("darkMode") === "true" || false
     );
@@ -346,6 +380,10 @@ export default defineComponent({
       } else {
         document.documentElement.classList.remove("dark");
       }
+    };
+
+    const toggleAccessibilityModal = () => {
+      showAccessibilityModal.value = !showAccessibilityModal.value;
     };
 
     const handleUserRoleChange = (event: CustomEvent) => {
@@ -458,6 +496,8 @@ export default defineComponent({
       toggleAvatarDropdown,
       avatarDropdown,
       route,
+      showAccessibilityModal,
+      toggleAccessibilityModal,
     };
   },
 });
