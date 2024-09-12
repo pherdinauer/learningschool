@@ -35,6 +35,26 @@
             </div>
             <div class="flex items-center space-x-4 searchContainer">
               <SearchBar v-model:searchQuery="searchQuery" />
+              <!-- Aggiungi il pulsante Upload Video qui -->
+              <button
+                v-if="isAdminUser"
+                @click="showUploadModal = true"
+                class="btn btn-primary btn-sm flex items-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Upload
+              </button>
             </div>
             <div class="flex justify-around items-center barTopRight">
               <!-- Dark mode toggle button -->
@@ -77,7 +97,7 @@
                 <img src="./assets/avatar.png" class="avatar" alt="Avatar" />
                 <p class="text-gray-300">
                   Welcome, <br />{{ isAdminUser ? "Admin" : "User" }}
-                  {{ username }}
+                  {{ "Valerio" }}
                 </p>
               </div>
             </div>
@@ -161,86 +181,6 @@
               </svg>
               <span v-if="!isCollapsed" class="ml-3">Manage Videos</span>
             </router-link>
-
-            <!-- Sezione Tag (visibile sempre, con layout diverso in base allo stato del menu) -->
-            <div
-              class="flex py-3 px-2 text-lg text-white hover:bg-primary hover:text-white flex-col"
-            >
-              <div
-                :class="`tagTitle ${isTagListCollapsed ? '' : 'listVisible'} ${
-                  isCollapsed ? ' menuCollapsed ' : ''
-                }`"
-              >
-                <h2
-                  class="text-lg font-semibold mt-2 mb-2 px-2 text-white flex items-center"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <span v-if="!isCollapsed">Tag</span>
-                </h2>
-                <button v-if="!isCollapsed" @click="toggleTagList">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e8eaed"
-                  >
-                    <path
-                      d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              <div
-                :class="`px-3 tagList ${
-                  isTagListCollapsed ? 'hidden' : 'visible'
-                } ${isCollapsed ? ' menuCollapsed ' : ''}`"
-              >
-                <div
-                  v-if="!isCollapsed"
-                  :class="[
-                    'space-y-q max-h-50 overflow-y-auto custom-scrollbar',
-                    { 'flex flex-col items-center': isCollapsed },
-                  ]"
-                >
-                  <button
-                    v-for="tag in uniqueTags"
-                    :key="tag"
-                    @click="toggleTagFilter(tag)"
-                    :class="[
-                      'w-full text-left flex justify-between items-center rounded transition-colors duration-200 text-white',
-                      { 'bg-blue-600 hover:bg-blue-700': selectedTag === tag },
-                      { 'hover:bg-primary': selectedTag !== tag },
-                      {
-                        'w-10 h-10 flex items-center justify-center':
-                          isCollapsed,
-                      },
-                    ]"
-                    :title="tag"
-                  >
-                    <span v-if="!isCollapsed">{{ tag }}</span>
-                    <span v-else>{{ tag.charAt(0).toUpperCase() }}</span>
-                    <span
-                      v-if="!isCollapsed && selectedTag === tag"
-                      class="ml-2 unselectTag"
-                      >&times;</span
-                    >
-                  </button>
-                </div>
-              </div>
-            </div>
           </nav>
 
           <div class="mt-auto">
@@ -266,26 +206,6 @@
         </div>
         <!-- Main content -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mainContent">
-          <div v-if="isAdminUser && !isLoginPage" class="mb-4 flex justify-end">
-            <button
-              @click="showUploadModal = true"
-              class="btn btn-primary btn-sm flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 mr-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              Upload Video
-            </button>
-          </div>
           <router-view
             :searchQuery="searchQuery"
             :selectedTag="selectedTag"

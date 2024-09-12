@@ -208,15 +208,70 @@ export default defineComponent({
 }
 
 .tag {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background-color: rgba(37, 99, 235, 0.15);
+  color: #1e40af;
   font-size: 0.6rem;
-  padding: 0.1rem 0.2rem;
+  padding: 0.1rem 0.3rem;
   border-radius: 9999px;
+  font-weight: 600;
+}
+
+/* Stili aggiornati per aumentare il contrasto in modalità chiara */
+.bg-gray-100 {
+  background-color: #f1f5f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-gray-900 {
+  color: #0f172a;
+}
+
+.text-gray-600 {
+  color: #334155;
+}
+
+.bg-gray-200 {
+  background-color: #cbd5e1;
+}
+
+.bg-blue-600 {
+  background-color: #2563eb;
+}
+
+/* Stile per il bordo della card */
+.border-gray-300 {
+  border-color: #94a3b8;
+}
+
+/* Stile per l'hover della card */
+.bg-gray-100:hover {
+  background-color: #e2e8f0;
+  transition: background-color 0.3s ease;
+}
+
+/* Manteniamo gli stili per la modalità scura */
+:global(.dark) .bg-gray-700 {
+  background-color: #1e293b;
+}
+
+:global(.dark) .border-gray-600 {
+  border-color: #475569;
+}
+
+:global(.dark) .text-white {
+  color: #f8fafc;
+}
+
+:global(.dark) .text-gray-300 {
+  color: #cbd5e1;
 }
 
 :global(.dark) .tag {
   background-color: rgba(59, 130, 246, 0.2);
   color: #93c5fd;
+}
+
+:global(.dark) .bg-gray-700 {
+  background-color: #334155;
 }
 </style>
