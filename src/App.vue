@@ -114,7 +114,10 @@
           <nav class="space-y-2">
             <router-link
               to="/"
-              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
+              :class="[
+                'flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white',
+                { selected: route.path === '/' },
+              ]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +133,10 @@
             </router-link>
             <router-link
               to="/favorites"
-              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
+              :class="[
+                'flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white',
+                { selected: route.path === '/favorites' },
+              ]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +152,10 @@
             </router-link>
             <router-link
               to="/playlists"
-              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
+              :class="[
+                'flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white',
+                { selected: route.path === '/playlists' },
+              ]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +176,10 @@
             <router-link
               v-if="isAdminUser"
               to="/video-management"
-              class="flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white"
+              :class="[
+                'flex items-center py-3 px-4 text-lg text-white hover:bg-primary hover:text-white',
+                { selected: route.path === '/video-management' },
+              ]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -405,6 +417,7 @@ export default defineComponent({
       isTagListCollapsed,
       toggleTagList,
       toggleSidebar,
+      route,
     };
   },
 });
@@ -452,14 +465,6 @@ export default defineComponent({
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
-}
-
-.sidebar-gradient {
-  background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
-}
-
-.toolbar-gradient {
-  background: linear-gradient(to bottom right, #2a2a2a 10%, #5a5a5a);
 }
 
 /* Stili per i pulsanti e le interazioni */

@@ -2,17 +2,12 @@
   <div class="flex flex-col custom-scrollbar">
     <!-- Tag filter bar -->
     <div class="tag-filter-bar py-4 px-4 overflow-x-auto">
-      <div class="flex space-x-2">
+      <div class="flex tagContainer">
         <button
           v-for="tag in uniqueTags"
           :key="tag"
           @click="toggleTagFilter(tag)"
-          :class="[
-            'px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200',
-            selectedTag === tag
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
-          ]"
+          :class="['tagButton', selectedTag === tag ? 'selectedTag' : '']"
         >
           {{ tag }}
         </button>

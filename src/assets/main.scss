@@ -7,6 +7,13 @@
 
   .barTopLeft {
     width: 16rem;
+    position: relative;
+
+    img {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 
   .searchContainer {
@@ -16,13 +23,17 @@
     .searchInputContainer {
       width: 90%;
 
+      svg {
+        fill: #000;
+      }
+
       button.ai-button {
         background: #2a2a2a;
         box-shadow: 0px 0px 14px 3px #ffffff;
       }
 
       input {
-        border: 1px solid #ffffff;
+        border: 1px solid #000;
         border-radius: 0.5rem;
         background-color: transparent;
       }
@@ -70,6 +81,16 @@
   position: fixed;
   z-index: 1;
   padding-top: 72px;
+
+  nav {
+    a {
+      font-size: 1.1rem;
+      &:hover,
+      &.selected {
+        background-color: #f0f0f0;
+      }
+    }
+  }
 
   .tagTitle {
     display: flex;
@@ -136,4 +157,58 @@
 .mainContent {
   margin-top: 72px;
   margin-left: 16rem !important;
+}
+
+.dark .sidebar-gradient {
+  background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+}
+.dark .toolbar-gradient {
+  background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+}
+
+.toolbar-gradient,
+.sidebar-gradient {
+  background: white;
+  svg {
+    stroke: black;
+  }
+  span {
+    color: black;
+  }
+}
+
+.dark {
+  .toolbar-gradient,
+  .sidebar-gradient {
+    background: black;
+    svg {
+      stroke: white;
+    }
+    span {
+      color: white;
+    }
+  }
+
+  .searchContainer {
+    width: 60%;
+    justify-content: center;
+
+    .searchInputContainer {
+      width: 90%;
+      svg {
+        fill: #fff;
+      }
+
+      button.ai-button {
+        background: #2a2a2a;
+        box-shadow: 0px 0px 14px 3px #ffffff;
+      }
+
+      input {
+        border: 1px solid #ffffff;
+        border-radius: 0.5rem;
+        background-color: transparent;
+      }
+    }
+  }
 }
