@@ -2,6 +2,7 @@ import mitt, { Emitter } from 'mitt';
 
 type Events = {
   'video-uploaded': void;
+  'video-created': void;
   // Aggiungi qui altri eventi se necessario
 };
 
