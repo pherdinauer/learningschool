@@ -20,7 +20,9 @@
     </div>
 
     <div class="w-full overflow-y-auto h-screen pb-20">
-      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+      <h2
+        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white sectionTitle"
+      >
         Playlist
       </h2>
       <div

@@ -130,6 +130,7 @@ interface Video {
 interface Playlist {
   id: string;
   name: string;
+  color: number[];
   videos: string[];
 }
 
@@ -258,11 +259,23 @@ export default defineComponent({
         b = q;
       }
 
-      return [
-        Math.floor((r ?? 0) * 256),
-        Math.floor((g ?? 0) * 256),
-        Math.floor((b ?? 0) * 256),
-      ];
+      let firstValue = Math.floor((r ?? 0) * 256);
+      let secondValue = Math.floor((g ?? 0) * 256);
+      let thirdValue = Math.floor((b ?? 0) * 256);
+
+      playlists.value.forEach((playlist) => {
+        while (
+          Math.abs(playlist.color[0] - firstValue) < 20 &&
+          Math.abs(playlist.color[1] - secondValue) < 20 &&
+          Math.abs(playlist.color[2] - thirdValue) < 20
+        ) {
+          h += goldenRatioConjugate;
+          h %= 1;
+          [firstValue, secondValue, thirdValue] = hsvToRgb(h, 0.5, 0.95);
+        }
+      });
+
+      return [firstValue, secondValue, thirdValue];
     };
 
     const goldenRatioConjugate = 0.618033988749895;
