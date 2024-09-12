@@ -189,8 +189,12 @@ const loadPlaylistsData = async () => {
 // Endpoint per ottenere tutti i video
 app.get("/videos", (req, res) => {
   console.log("Richiesta ricevuta per /videos");
-  console.log(`Invio di ${videos.length} video`);
-  res.json(videos);
+  const videosWithValidDates = videos.map(video => ({
+    ...video,
+    uploadDate: video.uploadDate || new Date().toISOString()
+  }));
+  console.log(`Invio di ${videosWithValidDates.length} video`);
+  res.json(videosWithValidDates);
 });
 
 // Endpoint per ottenere tutte le playlist
@@ -284,6 +288,7 @@ app.post("/upload", upload.single("video"), async (req, res) => {
       videoUrl: `/uploads/videos/${videoFile.filename}`,
       thumbnailUrl: `/uploads/thumbnails/${thumbnailFilename}`,
       tags,
+      uploadDate: new Date().toISOString(), // Aggiungi questa riga
     };
 
     videos.push(video);
