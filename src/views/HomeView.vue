@@ -72,13 +72,17 @@
       >
         Video
       </h2>
-      <Cards
-        :key="refreshKey"
-        :videos="filteredVideos"
-        :baseUrl="baseUrl"
-        @open-video-modal="openVideoModal"
-        @favorites-updated="updateFavorites"
-      />
+      <div v-if="filteredVideos.length > 0">
+        <Cards
+          :videos="filteredVideos"
+          :baseUrl="baseUrl"
+          @open-video-modal="openVideoModal"
+          @favorites-updated="updateFavorites"
+        />
+      </div>
+      <div v-else class="text-center py-10">
+        <p class="text-xl text-gray-600 dark:text-gray-400">Non ci sono risultati</p>
+      </div>
     </div>
 
     <!-- Video Modal -->
