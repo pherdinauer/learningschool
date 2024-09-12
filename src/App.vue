@@ -57,48 +57,98 @@
               </button>
             </div>
             <div class="flex justify-around items-center barTopRight">
-              <!-- Dark mode toggle button -->
-              <button
-                @click="toggleDarkMode"
-                class="btn-menu-transparent darkModeToggle"
-              >
-                <svg
-                  v-if="isDarkMode"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-                <svg
-                  v-else
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              </button>
-              <div class="avatarContainer">
+              <div class="avatarContainer" @click="toggleAvatarDropdown">
                 <img src="./assets/avatar.png" class="avatar" alt="Avatar" />
-                <p class="text-gray-300">
-                  Welcome, <br />{{ isAdminUser ? "Admin" : "User" }}
-                  {{ "Valerio" }}
-                </p>
+                <div v-show="avatarDropdown" class="avatar-dropdown-content">
+                  <p>
+                    Welcome, <br />{{ isAdminUser ? "Admin" : "User" }}
+                    {{ "Valerio" }}
+                  </p>
+                  <hr />
+                  <!-- Dark mode toggle button -->
+                  <button
+                    @click="toggleDarkMode"
+                    class="flex items-center text-white hover:bg-primary hover:text-white w-full darkModeToggle"
+                  >
+                    <svg
+                      v-if="isDarkMode"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                      />
+                    </svg>
+                    <span v-if="isDarkMode">Light Mode</span>
+                    <span v-else>Dark Mode</span>
+                  </button>
+                  <!-- Logout button -->
+                  <button
+                    @click="logout"
+                    class="flex items-center text-white hover:bg-primary hover:text-white w-full logoutButton"
+                  >
+                    <svg
+                      version="1.1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      class="h-5 w-5"
+                      viewBox="0 0 471.2 471.2"
+                      xml:space="preserve"
+                    >
+                      <g>
+                        <g>
+                          <path
+                            d="M227.619,444.2h-122.9c-33.4,0-60.5-27.2-60.5-60.5V87.5c0-33.4,27.2-60.5,60.5-60.5h124.9c7.5,0,13.5-6,13.5-13.5
+			s-6-13.5-13.5-13.5h-124.9c-48.3,0-87.5,39.3-87.5,87.5v296.2c0,48.3,39.3,87.5,87.5,87.5h122.9c7.5,0,13.5-6,13.5-13.5
+			S235.019,444.2,227.619,444.2z"
+                          ></path>
+                          <path
+                            d="M450.019,226.1l-85.8-85.8c-5.3-5.3-13.8-5.3-19.1,0c-5.3,5.3-5.3,13.8,0,19.1l62.8,62.8h-273.9c-7.5,0-13.5,6-13.5,13.5
+			s6,13.5,13.5,13.5h273.9l-62.8,62.8c-5.3,5.3-5.3,13.8,0,19.1c2.6,2.6,6.1,4,9.5,4s6.9-1.3,9.5-4l85.8-85.8
+			C455.319,239.9,455.319,231.3,450.019,226.1z"
+                          ></path>
+                        </g>
+                      </g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                      <g></g>
+                    </svg>
+                    <span v-if="!isCollapsed" class="ml-3">Logout</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -158,18 +208,15 @@
               ]"
             >
               <svg
+                id="fi_4043797"
+                viewBox="0 0 512 512"
+                class="h-6 w-6 playlistIcon"
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                fill="currentColor"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
+                  d="m280.593 449.83a16 16 0 0 1 -16 16h-248.593a16 16 0 0 1 0-32h248.593a16 16 0 0 1 16 16zm-16-151.538h-248.593a16 16 0 0 0 0 32h248.593a16 16 0 0 0 0-32zm-248.593-239.076h480a16 16 0 0 0 0-32h-480a16 16 0 0 0 0 32zm496 322.845a16 16 0 0 1 -7.773 13.723l-144.673 86.724a16 16 0 0 1 -24.226-13.724v-173.447a16 16 0 0 1 24.226-13.724l144.672 86.724a16 16 0 0 1 7.774 13.724zm-47.12 0-97.552-58.478v116.956zm31.12-219.307h-480a16 16 0 0 0 0 32h480a16 16 0 0 0 0-32z"
+                ></path>
               </svg>
               <span v-if="!isCollapsed" class="ml-3">Playlist</span>
             </router-link>
@@ -194,27 +241,6 @@
               <span v-if="!isCollapsed" class="ml-3">Manage Videos</span>
             </router-link>
           </nav>
-
-          <div class="mt-auto">
-            <button
-              @click="logout"
-              class="flex items-center py-3 px-6 text-lg text-white hover:bg-primary hover:text-white w-full"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <span v-if="!isCollapsed" class="ml-3">Logout</span>
-            </button>
-          </div>
         </div>
         <!-- Main content -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mainContent">
@@ -266,6 +292,7 @@ export default defineComponent({
     const uniqueTags = ref<string[]>([]);
     const selectedTag = ref<string | null>(null);
     const isCollapsed = ref(false);
+    const avatarDropdown = ref(false);
     const isTagListCollapsed = ref(false);
 
     const isLoggedIn = computed(() => {
@@ -360,6 +387,9 @@ export default defineComponent({
     const toggleSidebar = () => {
       isCollapsed.value = !isCollapsed.value;
     };
+    const toggleAvatarDropdown = () => {
+      avatarDropdown.value = !avatarDropdown.value;
+    };
 
     const toggleTagList = () => {
       isTagListCollapsed.value = !isTagListCollapsed.value;
@@ -417,6 +447,8 @@ export default defineComponent({
       isTagListCollapsed,
       toggleTagList,
       toggleSidebar,
+      toggleAvatarDropdown,
+      avatarDropdown,
       route,
     };
   },

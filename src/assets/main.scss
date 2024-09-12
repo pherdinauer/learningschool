@@ -16,6 +16,10 @@
     }
   }
 
+  .topBarContainer {
+    height: 100%;
+  }
+
   .searchContainer {
     width: 60%;
     justify-content: center;
@@ -63,11 +67,55 @@
     justify-content: center;
     align-items: center;
     padding: 8px;
+    position: relative;
+
+    .avatar-dropdown-content {
+      position: absolute;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      border-radius: 0.5rem;
+      background-color: white;
+      width: 10rem;
+      top: 90%;
+      right: 0;
+      transform: translateY(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: self-start;
+      justify-content: center;
+
+      hr {
+        width: 90%;
+        margin: auto;
+        border-color: #555353;
+      }
+
+      p {
+        width: 100%;
+        font-size: 1rem;
+        margin-top: 6px;
+        margin-bottom: 6px;
+      }
+
+      button {
+        padding: 10px;
+        width: 100%;
+        text-align: left;
+        span {
+          margin-left: 10px;
+          font-size: 1rem;
+        }
+        &:hover {
+          background-color: #f0f0f0;
+        }
+      }
+    }
+
     .avatar {
       vertical-align: middle;
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      cursor: pointer;
     }
     p {
       font-size: 10px;
@@ -88,6 +136,20 @@
       &:hover,
       &.selected {
         background-color: #f0f0f0;
+      }
+
+      svg {
+        fill: transparent;
+      }
+
+      svg.playlistIcon {
+        fill: #363636;
+      }
+
+      &.selected {
+        svg {
+          fill: #000;
+        }
       }
     }
   }
