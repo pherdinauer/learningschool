@@ -39,20 +39,29 @@
               <button
                 v-if="isAdminUser"
                 @click="showUploadModal = true"
-                class="btn btn-primary btn-sm flex items-center"
+                class="btn btn-primary btn-sm flex items-center uploadButton"
               >
                 <svg
+                  height="300"
+                  viewBox="0 0 32 32"
+                  width="300"
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+                  version="1.1"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  xmlns:svgjs="http://svgjs.dev/svgjs"
                 >
-                  <path
-                    fill-rule="evenodd"
-                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                    clip-rule="evenodd"
-                  />
+                  <g transform="matrix(1,0,0,1,0,0)">
+                    <g id="_05_video_upload" data-name="05 video upload">
+                      <path
+                        d="m24 16.08v-11.08a3 3 0 0 0 -3-3h-16a3 3 0 0 0 -3 3v16a3 3 0 0 0 3 3h11.08a7 7 0 1 0 7.92-7.92zm-20 4.92v-16a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v11.08a7 7 0 0 0 -5.92 5.92h-11.08a1 1 0 0 1 -1-1zm19 7a5 5 0 1 1 5-5 5 5 0 0 1 -5 5zm-5.55-14.11a1 1 0 0 0 0-1.78l-8-4a1 1 0 0 0 -1.45.89v8a1 1 0 0 0 .47.85 1 1 0 0 0 .53.15 1 1 0 0 0 .45-.11zm-7.45-3.27 4.76 2.38-4.76 2.38zm15.71 11.17a1 1 0 0 1 0 1.42 1 1 0 0 1 -1.42 0l-.29-.3v2.59a1 1 0 0 1 -2 0v-2.59l-.29.3a1 1 0 0 1 -1.42-1.42l2-2a1 1 0 0 1 1.42 0z"
+                        fill="#000000ff"
+                        data-original-color="#000000ff"
+                        stroke="none"
+                      />
+                    </g>
+                  </g>
                 </svg>
+
                 Upload
               </button>
             </div>

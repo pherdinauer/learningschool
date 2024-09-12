@@ -5,6 +5,33 @@
   height: 72px;
   z-index: 11;
 
+  .uploadButton {
+    height: 45px;
+    border-radius: 0.5rem;
+    width: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px;
+    padding-right: 8px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    svg {
+      height: 100%;
+    }
+
+    &:hover {
+      background-color: #000;
+      color: white;
+      svg {
+        * {
+          fill: white;
+        }
+      }
+    }
+  }
+
   .barTopLeft {
     width: 16rem;
     position: relative;
