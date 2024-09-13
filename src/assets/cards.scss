@@ -8,6 +8,7 @@
   padding-right: 5px;
   padding-left: 5px;
   font-size: 0.8rem;
+  margin-left: auto;
   svg {
     * {
       stroke: rgb(0 220 0);
@@ -93,5 +94,8 @@
 
   .carousel-button.next {
     right: 0;
+  }
+
+  &.noCarousel {
   }
 }

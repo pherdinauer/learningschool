@@ -1,5 +1,5 @@
 <template>
-  <div class="playlistCardsWrapper">
+  <div v-if="carouselMode" class="playlistCardsWrapper">
     <button class="carousel-button prev" @click="scrollLeft">
       <svg
         version="1.1"
@@ -87,6 +87,50 @@
       </svg>
     </button>
   </div>
+  <div
+    v-else
+    class="playlistCardsWrapper noCarousel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+  >
+    <div
+      v-for="playlist in playlists"
+      :key="playlist.id"
+      class="custom-card rounded-lg shadow-md overflow-hidden relative bg-white dark:bg-gray-800 cursor-pointer playlistCard"
+      @click="$emit('open-playlist-modal', playlist)"
+    >
+      <div class="playlistIcon">
+        <svg
+          id="fi_4043797"
+          height="512"
+          viewBox="0 0 512 512"
+          width="512"
+          xmlns="http://www.w3.org/2000/svg"
+          data-name="Layer 1"
+          :fill="
+            'rgb(' +
+            playlist.color[0] +
+            ',' +
+            playlist.color[1] +
+            ',' +
+            playlist.color[2] +
+            ')'
+          "
+        >
+          <path
+            d="m280.593 449.83a16 16 0 0 1 -16 16h-248.593a16 16 0 0 1 0-32h248.593a16 16 0 0 1 16 16zm-16-151.538h-248.593a16 16 0 0 0 0 32h248.593a16 16 0 0 0 0-32zm-248.593-239.076h480a16 16 0 0 0 0-32h-480a16 16 0 0 0 0 32zm496 322.845a16 16 0 0 1 -7.773 13.723l-144.673 86.724a16 16 0 0 1 -24.226-13.724v-173.447a16 16 0 0 1 24.226-13.724l144.672 86.724a16 16 0 0 1 7.774 13.724zm-47.12 0-97.552-58.478v116.956zm31.12-219.307h-480a16 16 0 0 0 0 32h480a16 16 0 0 0 0-32z"
+          ></path>
+        </svg>
+      </div>
+
+      <div class="playlistDescriptionWrapper">
+        <h3 class="text-lg font-semibold mb-2 line-clamp-2">
+          {{ playlist.name }}
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          {{ playlist.videos.length }} video
+        </p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -106,6 +150,10 @@ export default defineComponent({
     playlists: {
       type: Array as PropType<Playlist[]>,
       required: true,
+    },
+    carouselMode: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: ["open-playlist-modal"],

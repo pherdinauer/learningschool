@@ -29,6 +29,7 @@
         <PlaylistCards
           :playlists="playlists"
           @open-playlist-modal="openPlaylistModal"
+          :carouselMode="true"
         />
       </div>
 

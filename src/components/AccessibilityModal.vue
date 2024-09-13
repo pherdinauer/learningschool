@@ -3,7 +3,7 @@
     class="fixed inset-0 flex items-center justify-center z-50 outsideOverlay"
     @click.self="$emit('close')"
   >
-    <div class="accessibilityModal">
+    <div class="accessibilityModal" :class="{ XL: xlWidget }">
       <h1>Accessibility options</h1>
       <div class="accessibilityOptions">
         <div class="accessibilityProfiles">
@@ -85,7 +85,25 @@
             </div>
           </div>
           <div v-show="!profilesClosed" class="accessibilityProfilesList">
-            <button @click="toggleProfile('blind')">
+            <button
+              :class="{ selected: profileBlind }"
+              @click="toggleProfile('blind')"
+            >
+              <span v-show="profileBlind" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +123,25 @@
               </span>
               <span>Blind</span>
             </button>
-            <button @click="toggleProfile('dyslexia')">
+            <button
+              :class="{ selected: profileDyslexia }"
+              @click="toggleProfile('dyslexia')"
+            >
+              <span v-show="profileDyslexia" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +160,25 @@
               </span>
               <span>Dyslexia</span>
             </button>
-            <button @click="toggleProfile('lowVision')">
+            <button
+              :class="{ selected: profileLowVision }"
+              @click="toggleProfile('lowVision')"
+            >
+              <span v-show="profileLowVision" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +202,25 @@
               </span>
               <span>Low vision</span>
             </button>
-            <button @click="toggleProfile('learning')">
+            <button
+              :class="{ selected: profileLearning }"
+              @click="toggleProfile('learning')"
+            >
+              <span v-show="profileLearning" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -165,7 +237,25 @@
               </span>
               <span>Learning</span>
             </button>
-            <button @click="toggleProfile('adhd')">
+            <button
+              :class="{ selected: profileAdhd }"
+              @click="toggleProfile('adhd')"
+            >
+              <span v-show="profileAdhd" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -201,7 +291,25 @@
               </span>
               <span>ADHD</span>
             </button>
-            <button @click="toggleProfile('seizure')">
+            <button
+              :class="{ selected: profileSeizure }"
+              @click="toggleProfile('seizure')"
+            >
+              <span v-show="profileSeizure" class="selectedIcon"
+                ><svg
+                  height="512"
+                  viewBox="0 0 32 32"
+                  width="512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="fi_2920657"
+                >
+                  <g id="Layer_23" data-name="Layer 23">
+                    <path
+                      d="m16 2a14 14 0 1 0 14 14 14 14 0 0 0 -14-14zm7.21 10.21-9 9a1 1 0 0 1 -.71.29h-.06a1 1 0 0 1 -.72-.38l-4-5a1 1 0 1 1 1.56-1.24l3.3 4.12 8.21-8.21a1 1 0 0 1 1.42 1.42z"
+                    ></path>
+                  </g>
+                </svg>
+              </span>
               <span class="profilesOptionsIcon"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +349,7 @@
 
           <span>Oversized Widget</span>
           <label class="switchXLWidgetButton"
-            ><input type="checkbox" />
+            ><input type="checkbox" @change="toggleXLWidget" />
             <div></div>
           </label>
         </div>
@@ -772,24 +880,38 @@ export default defineComponent({
     const contrast = ref(false);
     const biggerText = ref(false);
     const screenReader = ref(false);
-
+    const profileBlind = ref(false);
+    const profileLowVision = ref(false);
+    const profileLearning = ref(false);
+    const profileAdhd = ref(false);
+    const profileSeizure = ref(false);
+    const profileDyslexia = ref(false);
+    const xlWidget = ref(false);
     const toggleProfile = (profile: string) => {
       if (profile === "blind") {
+        profileBlind.value = !profileBlind.value;
         toggleScreenReader();
       } else if (profile === "dyslexia") {
         toggleDyslexiaFriendly();
+        profileDyslexia.value = !profileDyslexia.value;
       } else if (profile === "lowVision") {
         toggleContrast();
+        profileLowVision.value = !profileLowVision.value;
       } else if (profile === "learning") {
         toggleTextSpacing();
-        toggleReadingGuide();
+        profileLearning.value = !profileLearning.value;
       } else if (profile === "adhd") {
         toggleCursor();
+        profileAdhd.value = !profileAdhd.value;
       } else if (profile === "seizure") {
         toggleReadingGuide();
+        profileSeizure.value = !profileSeizure.value;
       }
     };
 
+    const toggleXLWidget = () => {
+      xlWidget.value = !xlWidget.value;
+    };
     const toggleProfiles = () => {
       profilesClosed.value = !profilesClosed.value;
     };
@@ -968,6 +1090,14 @@ export default defineComponent({
       screenReader,
       toggleProfile,
       toggleScreenReader,
+      profileBlind,
+      profileDyslexia,
+      profileLowVision,
+      profileLearning,
+      profileAdhd,
+      profileSeizure,
+      xlWidget,
+      toggleXLWidget,
     };
   },
 });
