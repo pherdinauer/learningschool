@@ -305,7 +305,7 @@ import axios from "axios";
 import SearchBar from "@/components/SearchBar.vue";
 import "./assets/modal.scss";
 import "./assets/main.scss";
-import "./assets/accesibility.scss";
+import "./assets/accessibility.scss";
 
 export default defineComponent({
   name: "App",
