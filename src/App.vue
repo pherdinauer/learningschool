@@ -510,7 +510,7 @@ export default defineComponent({
 
 /* Varianti di colore */
 .btn-primary {
-  background-color: var(--color-primary, #3490dc);
+  background-color: var(--color-primary, #195d80);
   color: white;
 }
 

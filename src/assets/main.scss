@@ -145,6 +145,22 @@
   }
 }
 
+.dark {
+  .sidebar {
+    nav {
+      a {
+        &:hover,
+        &.selected {
+          background-color: #2a2a2a;
+          svg {
+            fill: #fff;
+          }
+        }
+      }
+    }
+  }
+}
+
 .sidebar {
   height: 100%;
   position: fixed;
@@ -242,9 +258,18 @@
   margin-left: 16rem !important;
 }
 
-button .btn {
-  background-color: #195d80 !important;
-  color: white;
+button {
+  &.closeBtn {
+    background-color: #195d80;
+    color: white;
+    margin-right: auto;
+    border: 1px solid #195d80;
+    &:hover {
+      color: #195d80;
+      border: 1px solid #195d80;
+      background-color: white !important;
+    }
+  }
 }
 
 .dark .sidebar-gradient {

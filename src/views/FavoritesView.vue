@@ -54,37 +54,20 @@
     </div>
 
     <!-- Video Modal -->
-    <div
+    <VideoPlayer
       v-if="selectedVideo"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-4xl w-full">
-        <h2 class="text-2xl font-bold mb-4 dark:text-white">
-          {{ selectedVideo.title }}
-        </h2>
-        <video
-          :src="getFullUrl(selectedVideo.videoUrl)"
-          controls
-          class="w-full mb-4"
-        ></video>
-        <h3 class="text-xl font-semibold mb-2 dark:text-white">Transcript:</h3>
-        <p class="text-gray-700 dark:text-gray-300">
-          {{ selectedVideo.transcript }}
-        </p>
-        <button
-          @click="closeVideoModal"
-          class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Close
-        </button>
-      </div>
-    </div>
+      :videoUrl="getFullUrl(selectedVideo?.videoUrl)"
+      :videoTitle="selectedVideo?.title"
+      :transcript="selectedVideo?.transcript"
+      @close="closeVideoModal"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from "vue";
 import axios from "axios";
+import VideoPlayer from "@/views/VideoPlayer.vue";
 
 interface Video {
   id: number;
@@ -97,6 +80,9 @@ interface Video {
 
 export default defineComponent({
   name: "FavoritesView",
+  components: {
+    VideoPlayer,
+  },
   setup() {
     const videos = ref<Video[]>([]);
     const selectedVideo = ref<Video | null>(null);
