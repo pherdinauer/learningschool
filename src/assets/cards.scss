@@ -50,7 +50,7 @@
     overflow-x: scroll; /* Changed from auto to scroll */
     width: calc(100% - 120px); /* Adjust width to account for button space */
     scroll-behavior: smooth; /* Add smooth scrolling */
-
+    overflow: hidden;
     .playlistCard {
       flex: 0 0 calc(20% - 10px); /* 5 items per view, with some margin */
       margin-right: 10px;
