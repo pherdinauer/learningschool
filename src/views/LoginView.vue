@@ -1,36 +1,52 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 transition-colors duration-300">
-    <div class="max-w-md w-full space-y-8 p-8 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Sign in to your account
-        </h2>
-      </div>
-      <form class="mt-8 space-y-6" @submit.prevent="login">
-        <input type="hidden" name="remember" value="true">
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label for="username" class="sr-only">Username</label>
-            <input id="username" name="username" type="text" required 
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
-              placeholder="Username" v-model="username">
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
-            <input id="password" name="password" type="password" required 
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
-              placeholder="Password" v-model="password">
-          </div>
-        </div>
-
-        <div>
-          <button type="submit" 
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-300">
-            Sign in
-          </button>
-        </div>
-      </form>
+  <div class="flex flex-col lg:flex-row relative">
+    <!-- Sezione sinistra (logo e titolo) -->
+    <div class="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-gray-900 dark:to-indigo-900 transition-colors duration-300 min-h-screen">
+      <img src="@/assets/logo.png" alt="Logo" class="w-48 h-48 mb-12 object-contain">
+      <h1 class="text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white text-center leading-tight max-w-2xl">
+        Benvenuto in <br> eXact Academy
+      </h1>
     </div>
+
+    <!-- Sezione destra (form di login) -->
+    <div class="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white dark:bg-gray-800">
+      <div class="w-full max-w-xl space-y-10">
+        <h2 class="text-center text-4xl font-bold text-gray-900 dark:text-white mb-8">
+          Accedi al tuo account
+        </h2>
+        <form class="space-y-8" @submit.prevent="login">
+          <div class="space-y-6">
+            <div>
+              <label for="username" class="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
+              <input id="username" name="username" type="text" required 
+                class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                placeholder="Inserisci il tuo username" v-model="username">
+            </div>
+            <div>
+              <label for="password" class="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+              <input id="password" name="password" type="password" required 
+                class="block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                placeholder="Inserisci la tua password" v-model="password">
+            </div>
+          </div>
+
+          <div>
+            <button type="submit" 
+              class="w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300">
+              Accedi
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Pulsante Dark Mode -->
+    <button @click="toggleDarkMode" 
+      class="absolute bottom-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white transition-colors duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -44,6 +60,7 @@ export default defineComponent({
     const router = useRouter();
     const username = ref('');
     const password = ref('');
+    const isDarkMode = ref(false);
 
     const login = () => {
       let userRole = '';
@@ -62,10 +79,16 @@ export default defineComponent({
       router.push('/');
     };
 
+    const toggleDarkMode = () => {
+      isDarkMode.value = !isDarkMode.value;
+      document.documentElement.classList.toggle('dark', isDarkMode.value);
+    };
+
     return {
       username,
       password,
-      login
+      login,
+      toggleDarkMode
     };
   }
 });
