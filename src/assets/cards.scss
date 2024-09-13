@@ -38,3 +38,60 @@
 .playlistCard {
   border: 1px solid #ddd;
 }
+
+.playlistCardsWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: center;
+
+  .carousel-container {
+    display: flex;
+    overflow-x: scroll; /* Changed from auto to scroll */
+    width: calc(100% - 120px); /* Adjust width to account for button space */
+    scroll-behavior: smooth; /* Add smooth scrolling */
+
+    .playlistCard {
+      flex: 0 0 calc(20% - 10px); /* 5 items per view, with some margin */
+      margin-right: 10px;
+    }
+
+    /* Hide scrollbar */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .carousel-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    transform: translateY(-50%);
+    z-index: 1;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      width: 50%;
+      * {
+        fill: #000;
+      }
+    }
+  }
+
+  .carousel-button.prev {
+    left: 0;
+  }
+
+  .carousel-button.next {
+    right: 0;
+  }
+}
