@@ -869,7 +869,8 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "AccessibilityModal",
 
-  setup() {
+  emits: ["setHC"],
+  setup(_, { emit }) {
     const profilesClosed = ref(true);
     const dyslexiaFriendly = ref(false);
     const textSpacing = ref(false);
@@ -929,8 +930,10 @@ export default defineComponent({
       contrast.value = !contrast.value;
       if (contrast.value) {
         document.body.classList.add("high-contrast");
+        emit("setHC", true);
       } else {
         document.body.classList.remove("high-contrast");
+        emit("setHC", false);
       }
     };
 

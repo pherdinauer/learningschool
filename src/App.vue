@@ -28,7 +28,13 @@
                   />
                 </svg>
               </button>
-              <img src="@/assets/logo.png" alt="Logo" class="w-32" />
+              <img
+                v-if="highContrast"
+                src="@/assets/logo_HC.png"
+                alt="Logo"
+                class="w-32"
+              />
+              <img v-else src="@/assets/logo.png" alt="Logo" class="w-32" />
             </div>
             <div class="flex items-center space-x-4 searchContainer">
               <SearchBar v-model:searchQuery="searchQuery" />
@@ -290,6 +296,7 @@
       <AccessibilityModal
         v-if="showAccessibilityModal"
         @close="showAccessibilityModal = false"
+        @setHC="toggleHightContrast"
       />
     </div>
   </div>
@@ -331,7 +338,7 @@ export default defineComponent({
     const isCollapsed = ref(false);
     const avatarDropdown = ref(false);
     const isTagListCollapsed = ref(false);
-
+    const highContrast = ref(false);
     const isLoggedIn = computed(() => {
       return !!userRole.value;
     });
@@ -354,7 +361,9 @@ export default defineComponent({
       );
       router.push("/login");
     };
-
+    const toggleHightContrast = () => {
+      highContrast.value = !highContrast.value;
+    };
     const handleVideoUploaded = () => {
       console.log("Video uploaded, emitting event...");
       eventBus.$emit("video-uploaded");
@@ -485,6 +494,8 @@ export default defineComponent({
       toggleTagFilter,
       clearTagFilter,
       isCollapsed,
+      highContrast,
+      toggleHightContrast,
       isTagListCollapsed,
       toggleTagList,
       toggleSidebar,
