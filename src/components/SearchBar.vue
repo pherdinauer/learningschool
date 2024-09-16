@@ -8,7 +8,9 @@
       class="w-full py-2 px-4 pr-20 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
       placeholder="Cerca tra i video o chiedi all'IA"
     />
-    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+    <div
+      class="absolute inset-y-0 right-0 flex items-center pr-3 searchIa-buttons-wrapper"
+    >
       <button
         @click="handleSearch"
         class="p-1 focus:outline-none focus:shadow-outline"

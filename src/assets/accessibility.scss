@@ -302,6 +302,14 @@ body {
       fill: yellow !important;
     }
 
+    .btn-menu-transparent {
+      svg {
+        * {
+          stroke: yellow !important;
+        }
+      }
+    }
+
     .outsideOverlay {
       background-color: transparent !important;
     }
